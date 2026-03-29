@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nova Página - MyFinance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        .font-black { font-weight: 900; }
+        #header-mobile { z-index: 1001 !important; }
+        #sidebar-lateral { z-index: 1000 !important; }
+        #sidebar-overlay { z-index: 999 !important; }
+
+        .shadow-suave { box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04), 0 2px 6px -2px rgba(0, 0, 0, 0.02); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex h-screen text-slate-900">
+
+<div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/80 lg:hidden transition-opacity"></div>
+
+<aside id="sidebar-lateral" class="fixed inset-y-0 left-0 w-64 bg-slate-800 text-white transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col shadow-2xl shrink-0 transition-transform duration-300 ease-in-out">
+    <div class="hidden lg:flex p-6 text-2xl font-bold border-b border-slate-700 items-center gap-2 text-blue-400">
+        <i class="fas fa-wallet"></i> <span class="text-white">MyFinance</span>
+    </div>
+
+    <nav class="flex-1 p-4 mt-20 lg:mt-0 space-y-2 text-sm font-black uppercase">
+        <a href="index.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-list-ul mr-2"></i> Transações</a>
+        <a href="investimentos.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
+        <a href="categorias.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-tags mr-2"></i> Categorias</a>
+        <a href="#" class="block p-3 rounded bg-blue-600 shadow"><i class="fas fa-star mr-2"></i> Nova Página</a>
+    </nav>
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+    <div id="header-mobile" class="lg:hidden fixed top-0 left-0 right-0 bg-slate-800 text-white p-4 flex items-center shadow-md h-16">
+        <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-700 rounded-lg transition-colors mr-3 w-10 h-10 flex items-center justify-center">
+            <i id="menu-icon" class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-blue-400">
+            MyFinanceQz
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto custom-scroll w-full pt-20 lg:pt-6">
+
+        <header class="px-4 lg:px-6 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 shrink-0">
+            <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-blue-500 transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight mb-1">Indicador 01</p>
+                <h2 id="valor-1" class="text-2xl font-black text-slate-800 tracking-tighter">R$ 0,00</h2>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-emerald-500 transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight mb-1">Indicador 02</p>
+                <h2 id="valor-2" class="text-2xl font-black text-slate-800 tracking-tighter">R$ 0,00</h2>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-amber-500 transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight mb-1">Indicador 03</p>
+                <h2 id="valor-3" class="text-2xl font-black text-slate-800 tracking-tighter">R$ 0,00</h2>
+            </div>
+        </header>
+
+        <section class="px-4 lg:px-6 pb-20">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm min-h-[300px] flex items-center justify-center">
+                <p class="text-gray-300 font-black uppercase text-xs tracking-[0.3em]">O conteúdo da sua nova página entra aqui</p>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<div class="fixed top-3 right-4 lg:top-auto lg:bottom-6 lg:right-6 z-[2000] flex flex-col items-end pointer-events-none">
+    <div id="status-conexao-flutuante" class="pointer-events-auto cursor-pointer flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xs lg:text-sm font-black uppercase tracking-widest w-10 h-10 lg:w-auto lg:h-auto lg:px-4 lg:py-3 rounded-full border shadow-2xl transition-all duration-500 transform bg-white opacity-0 scale-75">
+        <i id="status-icon" class="fas fa-sync fa-spin text-lg text-blue-500"></i>
+        <span id="status-text" class="hidden lg:inline-block">Conectando...</span>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[1500]"></div>
+
+<script src="faturas.js"></script>
+</body>
+</html>
