@@ -2,62 +2,81 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Investimentos - MyFinance</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
+    .font-black { font-weight: 900; }
+    #header-mobile { z-index: 1001 !important; }
+    #sidebar-lateral { z-index: 1000 !important; }
+    #sidebar-overlay { z-index: 999 !important; }
+    .modal-z { z-index: 1050 !important; }
+
+    .shadow-suave { box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04), 0 2px 6px -2px rgba(0, 0, 0, 0.02); }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; }
+
     .input-padrao { height: 60px; font-size: 1.25rem; font-weight: 900; text-align: center; border-radius: 0.75rem; border: 2px solid #e2e8f0; width: 100%; outline: none; transition: all 0.2s; }
     .input-padrao:focus { border-color: #2563eb; background-color: #f8fafc; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-
-    #toast-container {
-        z-index: 9999999 !important;
-        position: fixed !important;
-    }
   </style>
 </head>
-<body class="bg-gray-100 font-sans flex h-screen overflow-hidden text-slate-900">
+<body class="bg-gray-100 font-sans flex h-screen text-slate-900">
 
-<aside class="w-64 bg-slate-800 text-white hidden md:flex flex-col shadow-xl">
-  <div class="p-6 text-2xl font-bold border-b border-slate-700 flex items-center gap-2">
-    <i class="fas fa-wallet text-blue-400"></i> MyFinance
+<div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/80 lg:hidden transition-opacity"></div>
+
+<aside id="sidebar-lateral" class="fixed inset-y-0 left-0 w-64 bg-slate-800 text-white transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col shadow-2xl shrink-0 transition-transform duration-300 ease-in-out">
+  <div class="hidden lg:flex p-6 text-2xl font-bold border-b border-slate-700 items-center gap-2 text-blue-400">
+    <i class="fas fa-wallet"></i> <span class="text-white">MyFinance</span>
   </div>
-  <nav class="flex-1 p-4 space-y-2 text-sm">
+
+  <nav class="flex-1 p-4 mt-20 lg:mt-0 space-y-2 text-sm font-black uppercase">
     <a href="index.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-list-ul mr-2"></i> Transações</a>
-    <a href="investimentos.html" class="block p-3 rounded bg-blue-600 font-bold shadow"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
+    <a href="investimentos.html" class="block p-3 rounded bg-blue-600 shadow"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
+    <a href="categorias.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-tags mr-2"></i> Categorias</a>
   </nav>
 </aside>
 
-<main class="flex-1 flex flex-col overflow-y-auto">
-  <header class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
-      <p class="text-[11px] font-bold uppercase tracking-wider text-blue-300">Total Investido</p>
-      <h2 id="total-aportes" class="text-3xl font-black mt-1">R$ 0,00</h2>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+  <div id="header-mobile" class="lg:hidden fixed top-0 left-0 right-0 bg-slate-800 text-white p-4 flex items-center shadow-md h-16">
+    <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-700 rounded-lg transition-colors mr-3 w-10 h-10 flex items-center justify-center">
+      <i id="menu-icon" class="fas fa-bars text-xl"></i>
+    </button>
+    <div class="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-blue-400">
+      Investimentos
     </div>
-    <div id="card-rendimento-status" class="p-6 rounded-xl shadow-lg border-l-4 bg-white transition-all duration-500">
-      <p class="text-[11px] font-bold uppercase tracking-wider opacity-70">Total Rendimento / Lucro</p>
-      <h2 id="total-lucros" class="text-3xl font-black mt-1">R$ 0,00</h2>
-    </div>
-  </header>
-
-  <div id="db-status" class="px-6 py-2 font-bold text-[10px] uppercase tracking-widest transition-colors">
-    Iniciando sincronização...
   </div>
 
-  <section class="px-4 md:px-6 pb-6 flex-1">
-    <div id="grid-investimentos" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <button id="btn-fixo-aporte" onclick="tentarAbrirModalAporte()" class="group flex flex-col items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 min-h-[220px] hover:bg-blue-50 transition-all cursor-pointer">
-        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-plus"></i></div>
-        <span class="text-gray-500 font-bold text-sm uppercase">Adicionar Aporte</span>
-      </button>
-    </div>
-  </section>
+  <div class="flex-1 overflow-y-auto custom-scroll w-full pt-20 lg:pt-6">
+    <header class="px-4 lg:px-6 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 shrink-0">
+      <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-blue-500 transition-transform hover:scale-[1.02]">
+        <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight mb-1">Total Investido</p>
+        <h2 id="total-aportes" class="text-2xl font-black text-slate-800 tracking-tighter">R$ 0,00</h2>
+      </div>
+      <div id="card-rendimento-status" class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-slate-200 transition-transform hover:scale-[1.02]">
+        <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight mb-1">Total Rendimento / Lucro</p>
+        <h2 id="total-lucros" class="text-2xl font-black text-slate-800 tracking-tighter">R$ 0,00</h2>
+      </div>
+    </header>
+
+    <section class="px-4 lg:px-6 pb-24">
+      <div id="grid-investimentos" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <button id="btn-fixo-aporte" onclick="tentarAbrirModalAporte()" class="group flex flex-col items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 min-h-[220px] hover:bg-blue-50 transition-all cursor-pointer">
+          <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-plus"></i></div>
+          <span class="text-gray-500 font-bold text-sm uppercase">Adicionar Aporte</span>
+        </button>
+      </div>
+    </section>
+  </div>
 </main>
 
-<div id="modal-aporte" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="if(event.target === this) fecharModais()">
+<div id="modal-aporte" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center modal-z p-4" onclick="if(event.target === this) fecharModais()">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden" onclick="event.stopPropagation()">
     <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
       <h3 class="font-bold uppercase text-xs tracking-widest text-blue-300">Novo Aporte</h3>
@@ -67,7 +86,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Data</label><input type="text" id="ap-data" maxlength="10" oninput="mascaraData(this)" placeholder="DD/MM/AAAA" class="input-padrao bg-gray-50 font-mono"></div>
         <div><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Valor (R$)</label><input type="text" id="ap-valor" oninput="limitarDecimais(this)" placeholder="0,00" class="input-padrao border-blue-100 bg-blue-50 text-blue-700"></div>
-        <div class="md:col-span-2"><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Título do Ativo</label><input type="text" id="ap-descricao" class="w-full border border-gray-300 p-4 rounded-lg text-sm font-bold"></div>
+        <div class="md:col-span-2"><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Título do Ativo</label><input type="text" id="ap-descricao" class="w-full border border-gray-300 p-4 rounded-lg text-sm font-bold" placeholder="Ex: Tesouro Selic, FII MXRF11..."></div>
         <div><label class="block text-[10px] font-bold uppercase text-blue-600 mb-1">Sai de</label><select id="ap-conta-origem" class="w-full border border-gray-300 p-4 rounded-lg text-sm bg-white"></select></div>
         <div><label class="block text-[10px] font-bold uppercase text-blue-600 mb-1">Vai para</label><select id="ap-conta-destino" class="w-full border border-gray-300 p-4 rounded-lg text-sm bg-white"></select></div>
       </div>
@@ -76,7 +95,7 @@
   </div>
 </div>
 
-<div id="modal-resultado" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="if(event.target === this) fecharModais()">
+<div id="modal-resultado" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center modal-z p-4" onclick="if(event.target === this) fecharModais()">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border-t-8 transition-all" id="borda-modal-resultado" onclick="event.stopPropagation()">
     <div class="p-6">
       <h3 class="font-black uppercase tracking-widest text-slate-700 text-lg mb-4 text-center">Registrar Resultado</h3>
@@ -89,13 +108,13 @@
         </div>
         <div><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Data</label><input type="text" id="rd-data" maxlength="10" oninput="mascaraData(this)" class="input-padrao font-mono bg-gray-50"></div>
         <div><label class="block text-[10px] font-bold uppercase mb-1">Valor</label><input type="text" id="rd-valor" oninput="limitarDecimais(this)" placeholder="0,00" class="input-padrao"></div>
-        <button type="button" id="btn-save-resultado" onclick="salvarResultado(this)" class="w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase">Salvar Resultado</button>
+        <button type="button" id="btn-save-resultado" onclick="salvarResultado(this)" class="w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition-colors">Salvar Resultado</button>
       </form>
     </div>
   </div>
 </div>
 
-<div id="modal-sacar" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="if(event.target === this) fecharModais()">
+<div id="modal-sacar" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center modal-z p-4" onclick="if(event.target === this) fecharModais()">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border-t-8 border-orange-500" onclick="event.stopPropagation()">
     <div class="p-6">
       <h3 class="font-black uppercase tracking-widest text-orange-600 text-lg mb-4 text-center">Resgate</h3>
@@ -105,34 +124,655 @@
         <div><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Data</label><input type="text" id="sk-data" maxlength="10" oninput="mascaraData(this)" class="input-padrao font-mono bg-gray-50"></div>
         <div><label class="block text-[10px] font-bold uppercase text-orange-600 mb-1">Valor do Resgate</label><input type="text" id="sk-valor" oninput="limitarDecimais(this)" placeholder="0,00" class="input-padrao border-orange-200 bg-orange-50 text-orange-700"></div>
         <div><label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Conta de Destino</label><select id="sk-conta-destino" class="w-full border border-gray-300 p-4 rounded-lg text-sm bg-white"></select></div>
-        <button type="button" id="btn-save-sacar" onclick="salvarSaque(this)" class="w-full py-4 bg-orange-600 text-white font-bold rounded-lg uppercase">Confirmar Resgate</button>
+        <button type="button" id="btn-save-sacar" onclick="salvarSaque(this)" class="w-full py-4 bg-orange-600 text-white hover:bg-orange-700 font-bold rounded-lg uppercase transition-colors">Confirmar Resgate</button>
       </form>
     </div>
   </div>
 </div>
 
-<div id="modal-detalhes" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" onclick="if(event.target === this) fecharModais()">
+<div id="modal-detalhes" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center modal-z p-4" onclick="if(event.target === this) fecharModais()">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
     <div class="bg-slate-800 p-6 text-white flex justify-between items-start">
-      <div><h3 class="text-blue-400 font-bold uppercase text-xs" id="det-conta-nome"></h3><h2 class="text-2xl font-black" id="det-titulo-nome"></h2></div>
-      <button onclick="fecharModais()"><i class="fas fa-times text-2xl text-gray-400"></i></button>
+      <div><h3 class="text-blue-400 font-bold uppercase text-xs tracking-widest" id="det-conta-nome"></h3><h2 class="text-2xl font-black mt-1" id="det-titulo-nome"></h2></div>
+      <button onclick="fecharModais()"><i class="fas fa-times text-2xl text-gray-400 hover:text-white transition-colors"></i></button>
     </div>
     <div class="flex border-b bg-slate-50">
       <button onclick="alternarAba('grafico')" id="aba-btn-grafico" class="flex-1 py-4 font-bold text-sm uppercase border-b-4">Gráfico</button>
       <button onclick="alternarAba('lista')" id="aba-btn-lista" class="flex-1 py-4 font-bold text-sm uppercase border-b-4">Histórico</button>
     </div>
-    <div id="conteudo-grafico" class="flex-1 p-8 relative bg-white"><canvas id="grafico-evolucao"></canvas></div>
-    <div id="conteudo-lista" class="hidden flex-1 overflow-y-auto bg-white">
+
+    <div id="conteudo-grafico" class="flex-1 p-4 md:p-8 relative bg-white flex flex-col hidden">
+      <div id="grafico-paginacao" class="flex justify-between items-center mb-4 shrink-0">
+        <button onclick="moverGrafico(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors">Anterior</button>
+        ↑<div class="flex flex-col items-center">
+          <span id="txt-evolucao" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center">Evolução</span>
+          <button onclick="toggleMostrarTudoGrafico()" id="btn-mostrar-tudo" class="text-[9px] text-blue-600 font-black uppercase tracking-widest mt-1 hover:underline cursor-pointer">MOSTRAR TUDO</button>
+        </div>
+        <button onclick="moverGrafico(1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors">Próximo;</button>
+      </div>
+      <div class="flex-1 min-h-0 relative"><canvas id="grafico-evolucao"></canvas></div>
+    </div>
+
+    <div id="conteudo-lista" class="flex-1 overflow-y-auto custom-scroll bg-white">
+      <div id="resumo-historico" class="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-slate-100 p-4 sm:px-6 m-4 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col col-span-2 sm:col-span-1 text-center sm:text-left">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total Investido</span>
+          <span id="hist-investido" class="text-lg font-black text-slate-800">R$ 0,00</span>
+        </div>
+        <div class="flex flex-col text-center sm:text-center">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Lucro/Perda</span>
+          <span id="hist-valor-lucro" class="text-lg font-black">R$ 0,00</span>
+        </div>
+        <div class="flex flex-col text-center sm:text-right">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Porcentagem</span>
+          <span id="hist-porcentagem" class="text-lg font-black">0%</span>
+        </div>
+      </div>
+
       <table class="w-full text-left">
-        <thead class="bg-gray-50 sticky top-0 border-b"><tr><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Data</th><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Tipo</th><th class="p-4 text-right text-[10px] font-bold uppercase text-gray-400">Valor</th></tr></thead>
-        <tbody id="lista-historico" class="divide-y divide-gray-50"></tbody>
+        <thead class="bg-gray-50 sticky top-0 border-b shadow-sm"><tr><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Data</th><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Tipo</th><th class="p-4 text-right text-[10px] font-bold uppercase text-gray-400">Valor</th></tr></thead>
+        <tbody id="lista-historico" class="divide-y divide-gray-100"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 flex flex-col gap-3 pointer-events-none" style="z-index: 9999999 !important;"></div>
+<div style="z-index: 9999 !important;" class="fixed top-3 right-4 lg:top-auto lg:bottom-6 lg:right-6 flex flex-col items-end pointer-events-none">
+  <div id="status-conexao-flutuante" class="pointer-events-auto cursor-pointer flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xs lg:text-sm font-black uppercase tracking-widest w-10 h-10 lg:w-auto lg:h-auto lg:px-4 lg:py-3 rounded-full border shadow-2xl transition-all duration-500 transform bg-white opacity-0 scale-75">
+    <i id="status-icon" class="fas fa-sync fa-spin text-lg text-blue-500"></i>
+    <span id="status-text" class="hidden lg:inline-block">Conectando...</span>
+  </div>
+</div>
 
-<script src="investimentos.js"></script>
+<div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-1050"></div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycby7cBP4XB5-ldRA9P07qLd0onh6GIx79FP_xfK2KHE5GnYogm1xgP-Ft9iy-6z3DkJE_A/exec";
+
+  let listaContas = [];
+  let dadosBrutosGlobais = [];
+  let meuGrafico = null;
+  let isDatabaseLoaded = false;
+  let statusTimeout1, statusTimeout2;
+
+  // Variáveis Globais do Gráfico
+  let globalGraphLabels = [];
+  let globalGraphData = [];
+  let globalGraphMotivos = [];
+  let currentGraphIndex = 0;
+  let mostrarTodosOsDados = false;
+
+  // ==========================================
+  // 1. INICIALIZAÇÃO
+  // ==========================================
+  window.addEventListener('load', async () => {
+      atualizarStatus('conectando');
+      await carregarContas();
+      await buscarDadosInvestimentos();
+  });
+
+  document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharModais();
+  });
+
+  function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar-lateral');
+      const overlay = document.getElementById('sidebar-overlay');
+      const icon = document.getElementById('menu-icon');
+
+      if (sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+          icon.classList.replace('fa-bars', 'fa-times');
+      } else {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+          icon.classList.replace('fa-times', 'fa-bars');
+      }
+  }
+
+  function atualizarStatus(tipo) {
+      const el = document.getElementById('status-conexao-flutuante');
+      const span = document.getElementById('status-text');
+      const icon = document.getElementById('status-icon');
+
+      clearTimeout(statusTimeout1);
+      clearTimeout(statusTimeout2);
+
+      el.classList.remove('opacity-0', 'scale-75');
+      el.classList.add('opacity-100', 'scale-100', 'lg:px-4', 'lg:gap-3');
+      el.classList.remove('lg:px-0', 'lg:w-10', 'lg:h-10', 'lg:justify-center');
+      span.className = "hidden lg:inline-block";
+
+      const baseClass = "pointer-events-auto cursor-pointer flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xs lg:text-sm font-black uppercase tracking-widest w-10 h-10 lg:w-auto lg:h-auto rounded-full border shadow-2xl transition-all duration-500 transform opacity-100 scale-100 ";
+
+      if (tipo === 'conectando') {
+          el.className = baseClass + "text-yellow-600 bg-yellow-50 border-yellow-200 lg:px-4";
+          span.innerText = "Conectando..."; icon.className = "fas fa-sync fa-spin text-lg";
+      } else if (tipo === 'sucesso') {
+          el.className = baseClass + "text-green-600 bg-green-50 border-green-200 lg:px-4";
+          span.innerText = "Banco Conectado"; icon.className = "fas fa-check-circle text-lg";
+
+          statusTimeout1 = setTimeout(() => {
+              span.classList.replace('lg:inline-block', 'hidden');
+              el.classList.remove('lg:px-4', 'lg:gap-3');
+              el.classList.add('lg:px-0', 'lg:w-10', 'lg:h-10', 'lg:justify-center');
+              statusTimeout2 = setTimeout(() => { el.classList.remove('opacity-100', 'scale-100'); el.classList.add('opacity-0', 'scale-75'); }, 1500);
+          }, 3000);
+      } else {
+          el.className = baseClass + "text-red-600 bg-red-50 border-red-200 lg:px-4";
+          span.innerText = "Erro Banco"; icon.className = "fas fa-exclamation-triangle text-lg";
+      }
+  }
+
+  function notify(tipo, msg) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `${tipo === 'sucesso' ? 'bg-green-600' : 'bg-red-600'} text-white px-8 py-3 rounded-xl shadow-2xl font-black text-[10px] uppercase animate-bounce mt-2`;
+      toast.innerText = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+  }
+
+  // ==========================================
+  // 2. FUNÇÕES DE MODAL E MÁSCARAS
+  // ==========================================
+  function fecharModais() {
+      ['modal-aporte', 'modal-resultado', 'modal-detalhes', 'modal-sacar'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.add('hidden');
+      });
+
+      document.getElementById('form-aporte').reset();
+      document.getElementById('form-resultado').reset();
+      document.getElementById('form-sacar').reset();
+
+      const campos = document.querySelectorAll('.input-padrao, input, select');
+      campos.forEach(c => c.classList.remove('animate-shake', 'border-red-500'));
+  }
+
+  function tentarAbrirModalAporte() {
+      if (!isDatabaseLoaded) { notify('erro', 'Aguarde a conexão com o banco.'); return; }
+      document.getElementById('ap-data').value = getDataHojeBR();
+      document.getElementById('modal-aporte').classList.remove('hidden');
+  }
+
+  function abrirModalResultado(conta, titulo) {
+      document.getElementById('rd-conta').value = conta;
+      document.getElementById('rd-titulo').value = titulo;
+      document.getElementById('rd-conta-nome').innerText = titulo;
+      document.getElementById('rd-data').value = getDataHojeBR();
+      setTipoResultado('RENDIMENTO');
+      document.getElementById('modal-resultado').classList.remove('hidden');
+  }
+
+  function abrirModalSacar(conta, titulo, saldo) {
+      document.getElementById('sk-conta-origem').value = conta;
+      document.getElementById('sk-titulo').value = titulo;
+      document.getElementById('sk-ativo-nome').innerText = titulo;
+      document.getElementById('sk-data').value = getDataHojeBR();
+      document.getElementById('sk-saldo-max').value = saldo;
+      document.getElementById('sk-txt-saldo').innerText = 'Saldo disponível: R$ ' + saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      const inputVal = document.getElementById('sk-valor');
+      inputVal.value = "";
+      inputVal.classList.remove('animate-shake', 'border-red-500');
+
+      document.getElementById('modal-sacar').classList.remove('hidden');
+  }
+
+  function limitarDecimais(input) {
+      let cursor = input.selectionStart;
+      let valorOriginal = input.value;
+      let v = valorOriginal.replace(/[^0-9.,]/g, '');
+
+      const match = v.match(/[.,]/g);
+      if (match && match.length > 1) {
+          const pIdx = v.search(/[.,]/);
+          v = v.substring(0, pIdx + 1) + v.substring(pIdx + 1).replace(/[.,]/g, '');
+      }
+
+      const idxSep = v.search(/[.,]/);
+      if (idxSep !== -1) {
+          v = v.substring(0, idxSep) + v[idxSep] + v.substring(idxSep + 1).substring(0, 2);
+      }
+
+      if (v.length > 10) v = v.substring(0, 10);
+
+      if (valorOriginal !== v) {
+          input.value = v;
+          let ajuste = v.length - valorOriginal.length;
+          input.setSelectionRange(cursor + ajuste, cursor + ajuste);
+      }
+  }
+
+  function formatarDataParaISO(dataBR) {
+      if (!dataBR || !dataBR.includes('/')) return dataBR;
+      const [dia, mes, ano] = dataBR.split('/');
+      return `${ano}-${mes}-${dia}`;
+  }
+
+  // ==========================================
+  // 3. LANÇAMENTOS E COMUNICAÇÃO (APIs)
+  // ==========================================
+  async function enviarParaGoogle(dados) {
+      const response = await fetch(`${API_URL}?tipo=criar_gasto`, {
+          method: 'POST',
+          redirect: 'follow',
+          body: JSON.stringify(dados)
+      });
+      return await response.json();
+  }
+
+  async function salvarAporte(btn) {
+      if (!validarCampos(['ap-data', 'ap-valor', 'ap-descricao'])) return;
+      const labelOriginal = btn.innerText;
+      btn.innerText = "LANÇANDO..."; btn.disabled = true;
+
+      const d = formatarDataParaISO(document.getElementById('ap-data').value);
+      const v = parseFloat(document.getElementById('ap-valor').value.replace(',', '.')).toFixed(2);
+      const t = document.getElementById('ap-descricao').value;
+      const ori = document.getElementById('ap-conta-origem').value;
+      const dest = document.getElementById('ap-conta-destino').value;
+
+      try {
+          await enviarParaGoogle({ data: d, valor: v, local: ori, descricao: t + ' (Saída)', categoria: 'INVESTIMENTOS', conta: ori, tipo: 'SAIDA', forma_pagamento: 'DEBITO' });
+          await enviarParaGoogle({ data: d, valor: v, local: ori, descricao: t, categoria: 'INVESTIMENTOS', conta: dest, tipo: 'ENTRADA', forma_pagamento: 'INVESTIMENTO' });
+
+          notify('sucesso', 'Aporte registrado!');
+          fecharModais();
+          await buscarDadosInvestimentos();
+      } catch (e) { notify('erro', 'Erro ao salvar aporte.'); }
+      finally { btn.innerText = labelOriginal; btn.disabled = false; }
+  }
+
+  async function salvarResultado(btn) {
+      if (!validarCampos(['rd-data', 'rd-valor'])) return;
+
+      const tipoRes = document.getElementById('rd-tipo').value;
+      const vInput = parseFloat(document.getElementById('rd-valor').value.replace(',', '.'));
+      const d = formatarDataParaISO(document.getElementById('rd-data').value);
+      const tit = document.getElementById('rd-titulo').value;
+      const conta = document.getElementById('rd-conta').value;
+
+      const ativos = calcularSaldosAtuais();
+      const saldoCard = ativos[`${conta}|${tit}`] ? ativos[`${conta}|${tit}`].total : 0;
+
+      if (tipoRes === 'PREJUIZO' && vInput >= (saldoCard - 0.001)) {
+          notify('erro', 'O prejuízo não pode ser igual ou maior que o saldo atual!');
+          document.getElementById('rd-valor').classList.add('animate-shake', 'border-red-500');
+          return;
+      }
+
+      const labelOriginal = btn.innerText;
+      btn.innerText = "SALVANDO..."; btn.disabled = true;
+
+      try {
+          await enviarParaGoogle({ data: d, valor: vInput.toFixed(2), local: conta, descricao: tit + (tipoRes === 'RENDIMENTO' ? ' (Rendimento)' : ' (Prejuízo)'), categoria: tipoRes, conta: conta, tipo: tipoRes === 'RENDIMENTO' ? 'ENTRADA' : 'SAIDA', forma_pagamento: 'INVESTIMENTO' });
+          notify('sucesso', 'Resultado registrado!');
+          fecharModais();
+          await buscarDadosInvestimentos();
+      } catch (e) { notify('erro', 'Falha ao salvar resultado.'); }
+      finally { btn.innerText = "Salvar"; btn.disabled = false; }
+  }
+
+  async function salvarSaque(btn) {
+      const valStr = document.getElementById('sk-valor').value;
+      if (!valStr) {
+          document.getElementById('sk-valor').classList.add('animate-shake', 'border-red-500');
+          return;
+      }
+
+      const v = parseFloat(valStr.replace(',', '.'));
+      const m = parseFloat(document.getElementById('sk-saldo-max').value);
+
+      if (v > (m + 0.01)) {
+          notify('erro', 'Valor acima do saldo disponível!');
+          document.getElementById('sk-valor').classList.add('animate-shake', 'border-red-500');
+          return;
+      }
+
+      btn.innerText = "SACANDO..."; btn.disabled = true;
+      const d = formatarDataParaISO(document.getElementById('sk-data').value);
+      const tit = document.getElementById('sk-titulo').value;
+      const ori = document.getElementById('sk-conta-origem').value;
+      const dest = document.getElementById('sk-conta-destino').value;
+
+      try {
+          await enviarParaGoogle({ data: d, valor: v.toFixed(2), local: ori, descricao: tit + ' (Resgate)', categoria: 'Desinvestimento', conta: ori, tipo: 'SAIDA', forma_pagamento: 'INVESTIMENTO' });
+          await enviarParaGoogle({ data: d, valor: v.toFixed(2), local: ori, descricao: 'Resgate: ' + tit, categoria: 'Desinvestimento', conta: dest, tipo: 'ENTRADA', forma_pagamento: 'DEBITO' });
+
+          notify('sucesso', 'Resgate concluído!');
+          fecharModais();
+          await buscarDadosInvestimentos();
+      } catch (e) { notify('erro', 'Erro no processamento.'); }
+      finally { btn.innerText = "Confirmar Resgate"; btn.disabled = false; }
+  }
+
+  // ==========================================
+  // 4. CÁLCULOS E RENDERIZAÇÃO DE DASHBOARD
+  // ==========================================
+  function calcularSaldosAtuais() {
+      let resumo = {};
+      dadosBrutosGlobais.forEach(item => {
+          const v = parseFloat(item.valor) || 0;
+          const tit = getTituloPuro(item.descricao);
+          const desc = String(item.descricao || "");
+          const chave = `${item.conta}|${tit}`;
+          if (!resumo[chave]) resumo[chave] = { conta: item.conta, titulo: tit, aporte: 0, lucro: 0, total: 0 };
+          if (desc.includes("(Rendimento)") || desc.includes("(Prejuízo)")) {
+              if (item.tipo === "ENTRADA") resumo[chave].lucro += v; else resumo[chave].lucro -= v;
+          } else {
+              if (item.tipo === "ENTRADA") resumo[chave].aporte += v; else resumo[chave].aporte -= v;
+          }
+          resumo[chave].total = resumo[chave].aporte + resumo[chave].lucro;
+      });
+      return resumo;
+  }
+
+  async function carregarContas() {
+      try {
+          const res = await fetch(`${API_URL}?tipo=contas`);
+          listaContas = await res.json();
+          const html = listaContas.map(i => {
+              const n = (typeof i === 'object') ? i.conta : i;
+              return `<option value="${n}">${n}</option>`;
+          }).join('');
+          document.getElementById('ap-conta-origem').innerHTML = html;
+          document.getElementById('ap-conta-destino').innerHTML = html;
+          document.getElementById('sk-conta-destino').innerHTML = html;
+      } catch (e) { console.error(e); }
+  }
+
+  async function buscarDadosInvestimentos() {
+      isDatabaseLoaded = false;
+      try {
+          const res = await fetch(`${API_URL}?tipo=todos`);
+          const todosDados = await res.json();
+          dadosBrutosGlobais = todosDados.filter(i => i.forma_pagamento === "INVESTIMENTO");
+          isDatabaseLoaded = true;
+
+          atualizarStatus('sucesso');
+          processarEstatistica(dadosBrutosGlobais);
+      } catch (e) {
+          atualizarStatus('erro');
+      }
+  }
+
+  function processarEstatistica(dados) {
+      const resumo = calcularSaldosAtuais();
+      let globalAporte = 0, globalLucro = 0;
+      for (const k in resumo) {
+          if (resumo[k].total > 0.009) {
+              globalAporte += resumo[k].aporte;
+              globalLucro += resumo[k].lucro;
+          }
+      }
+
+      document.getElementById('total-aportes').innerText = `R$ ${globalAporte.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      document.getElementById('total-lucros').innerText = `R$ ${globalLucro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+      const cardH = document.getElementById('card-rendimento-status');
+      const baseClass = "bg-white p-5 rounded-xl shadow-sm border-l-[16px] transition-transform hover:scale-[1.02] ";
+
+      if (globalLucro > 0) {
+          cardH.className = baseClass + "border-emerald-500";
+      } else if (globalLucro < 0) {
+          cardH.className = baseClass + "border-red-500";
+      } else {
+          cardH.className = baseClass + "border-slate-200";
+      }
+
+      renderizarCards(resumo);
+  }
+
+  function renderizarCards(resumo) {
+      const grid = document.getElementById('grid-investimentos');
+      const btnAporte = document.getElementById('btn-fixo-aporte').outerHTML;
+      let html = btnAporte;
+
+      for (const [chave, valores] of Object.entries(resumo)) {
+          if (valores.total <= 0.009) continue;
+
+          let pct = (valores.aporte > 0) ? (valores.lucro / valores.aporte) * 100 : 0;
+          const seta = pct >= 0 ? '↑' : '↓';
+          const corPct = pct >= 0 ? 'text-green-500' : 'text-red-500';
+          const valorLimpo = Math.abs(pct).toFixed(2);
+          const tEsc = valores.titulo.replace(/'/g, "\\'");
+
+          html += `
+          <div onclick="abrirModalDetalhes('${valores.conta}', '${tEsc}', ${valores.total})" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:-translate-y-1 cursor-pointer group">
+              <div class="bg-slate-50 p-4 border-b group-hover:bg-blue-50 transition-colors">
+                  <h4 class="font-bold text-slate-800 uppercase text-[10px] tracking-widest">${valores.conta}</h4>
+                  <p class="text-xs font-bold truncate">${valores.titulo}</p>
+              </div>
+              <div class="p-6 flex-1 text-center flex flex-col justify-center">
+                  <p class="text-[9px] text-gray-400 font-bold uppercase mb-1">Saldo Atual</p>
+                  <h2 class="text-2xl font-black text-slate-800">R$ ${valores.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
+                  <p class="text-[18px] font-black mt-2 ${corPct}"><span class="font-black">${seta}</span> ${valorLimpo}%</p>
+              </div>
+
+              <div class="flex">
+                  <button onclick="event.stopPropagation(); abrirModalResultado('${valores.conta}', '${tEsc}')"
+                      class="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-white font-black text-[11px] uppercase tracking-tighter transition-colors">
+                      Resultado
+                  </button>
+                  <button onclick="event.stopPropagation(); abrirModalSacar('${valores.conta}', '${tEsc}', ${valores.total})"
+                      class="flex-1 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-[11px] uppercase tracking-tighter transition-colors border-l border-white/10">
+                      Sacar
+                  </button>
+              </div>
+          </div>`;
+      }
+      grid.innerHTML = html;
+  }
+
+  // ==========================================
+  // 5. HISTÓRICO E GRÁFICO PAGINADO
+  // ==========================================
+  function renderizarGraficoPaginado() {
+      let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
+      let labelsVisiveis, dataVisiveis, motivosVisiveis;
+
+      if (mostrarTodosOsDados) {
+          labelsVisiveis = globalGraphLabels;
+          dataVisiveis = globalGraphData;
+          motivosVisiveis = globalGraphMotivos;
+          document.getElementById('txt-evolucao').innerText = "Evolução (Todo o Período)";
+          document.getElementById('btn-mostrar-tudo').innerText = "MOSTRAR PAGINADO";
+      } else {
+          labelsVisiveis = globalGraphLabels.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
+          dataVisiveis = globalGraphData.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
+          motivosVisiveis = globalGraphMotivos.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
+          document.getElementById('txt-evolucao').innerText = `Evolução (Até ${limiteLimpo} pontos)`;
+          document.getElementById('btn-mostrar-tudo').innerText = "MOSTRAR TUDO";
+      }
+
+      const ctx = document.getElementById('grafico-evolucao').getContext('2d');
+      if (meuGrafico) meuGrafico.destroy();
+
+      meuGrafico = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: labelsVisiveis,
+              datasets: [{
+                  data: dataVisiveis,
+                  fill: true,
+                  backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                  tension: 0.3,
+                  pointRadius: 8,
+                  pointHoverRadius: 12,
+                  pointBackgroundColor: '#2563eb',
+                  segment: {
+                      borderColor: ctx => {
+                          const tipo = motivosVisiveis[ctx.p1DataIndex];
+                          if (tipo === "Lucro") return '#22c55e';
+                          if (tipo === "Perda") return '#ef4444';
+                          if (tipo === "Saque") return '#f97316';
+                          if (tipo === "Aporte") return '#2563eb';
+                          return '#2563eb';
+                      },
+                      borderWidth: 5
+                  }
+              }]
+          },
+          options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { enabled: true, displayColors: false, backgroundColor: 'rgba(15, 23, 42, 0.95)', padding: 15, titleFont: { size: 18 }, bodyFont: { size: 24, weight: 'black' }, callbacks: { label: (c) => ' Saldo: R$ ' + parseFloat(c.parsed.y).toLocaleString('pt-BR', {minimumFractionDigits: 2}) } } },
+              scales: { y: { ticks: { font: { size: 15, weight: 'bold' }, callback: (v) => 'R$ ' + v.toLocaleString('pt-BR') } }, x: { ticks: { font: { size: 15, weight: 'bold' } } } }
+          }
+      });
+  }
+
+  function moverGrafico(dir) {
+      let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
+      let maxIndex = Math.max(0, globalGraphLabels.length - limiteLimpo);
+      let novoIndex = currentGraphIndex + dir;
+
+      if (novoIndex >= 0 && novoIndex <= maxIndex) {
+          currentGraphIndex = novoIndex;
+          if (!mostrarTodosOsDados) {
+              renderizarGraficoPaginado();
+          }
+      }
+  }
+
+  function toggleMostrarTudoGrafico() {
+      mostrarTodosOsDados = !mostrarTodosOsDados;
+      renderizarGraficoPaginado();
+  }
+
+  function abrirModalDetalhes(conta, titulo, total) {
+      try {
+          const titR = String(titulo).replace(/&quot;/g, '"');
+          document.getElementById('det-conta-nome').innerText = conta;
+          document.getElementById('det-titulo-nome').innerText = titR;
+
+          let hist = dadosBrutosGlobais.filter(i => String(i.conta) === String(conta) && getTituloPuro(i.descricao) === titR);
+          hist.sort((a, b) => a.data.split('/').reverse().join('').localeCompare(b.data.split('/').reverse().join('')));
+
+          let saldoAc = 0, labels = [], dataPoints = [], htmlRows = [], motivos = [];
+          let totalInvestido = 0;
+          let totalLucroPerda = 0;
+
+          hist.forEach(i => {
+              const v = parseFloat(i.valor) || 0;
+              let op = "Aporte", cor = "text-blue-600", sin = "+";
+
+              if (i.descricao.includes("(Rendimento)") || i.descricao.includes("(Prejuízo)")) {
+                  if (i.tipo === "ENTRADA") {
+                      saldoAc += v; op = "Lucro"; cor = "text-green-600";
+                      totalLucroPerda += v;
+                  } else {
+                      saldoAc -= v; op = "Perda"; cor = "text-red-600"; sin = "-";
+                      totalLucroPerda -= v;
+                  }
+              } else {
+                  if (i.tipo === "ENTRADA") {
+                      saldoAc += v; op = "Aporte";
+                      totalInvestido += v;
+                  } else {
+                      saldoAc -= v; op = "Saque"; cor = "text-orange-500"; sin = "-";
+                      totalInvestido -= v;
+                  }
+              }
+
+              labels.push(i.data.substring(0, 5) + '/' + i.data.substring(8, 10));
+              dataPoints.push(saldoAc.toFixed(2));
+              motivos.push(op);
+
+              htmlRows.push(`
+                  <tr class="border-b">
+                      <td class="p-4 text-[15px] font-bold font-mono">${i.data}</td>
+                      <td class="p-4 text-[16px] font-black uppercase ${cor}">${op}</td>
+                      <td class="p-4 text-right text-[18px] font-black ${cor}">${sin} R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                  </tr>`);
+          });
+
+          // Popula Valores do Resumo Histórico
+          document.getElementById('hist-investido').innerText = `R$ ${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+          document.getElementById('hist-valor-lucro').innerText = `R$ ${totalLucroPerda.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+          let pct = totalInvestido > 0 ? (totalLucroPerda / totalInvestido) * 100 : 0;
+          document.getElementById('hist-porcentagem').innerText = `${pct.toFixed(2)}%`;
+
+          const corClasse = totalLucroPerda >= 0 ? 'text-green-600' : 'text-red-600';
+          document.getElementById('hist-valor-lucro').className = `text-lg font-black ${corClasse}`;
+          document.getElementById('hist-porcentagem').className = `text-lg font-black ${corClasse}`;
+
+          document.getElementById('lista-historico').innerHTML = htmlRows.reverse().join('');
+
+          // Verifica se é aplicativo para sumir com botão do Gráfico
+          const isAplicativo = conta.toLowerCase().includes('aplicativo') || titR.toLowerCase().includes('aplicativo');
+          const abaGraficoBtn = document.getElementById('aba-btn-grafico');
+
+          if (isAplicativo) {
+              abaGraficoBtn.style.display = 'none';
+          } else {
+              abaGraficoBtn.style.display = 'block';
+          }
+
+          // Sempre abre por padrão na Aba Lista (Histórico)
+          alternarAba('lista');
+
+          // Configuração do Gráfico
+          globalGraphLabels = labels;
+          globalGraphData = dataPoints;
+          globalGraphMotivos = motivos;
+
+          let limiteCalculado = window.innerWidth <= 768 ? 3 : 5;
+          currentGraphIndex = Math.max(0, globalGraphLabels.length - limiteCalculado);
+          mostrarTodosOsDados = false;
+
+          if (!isAplicativo) {
+              renderizarGraficoPaginado();
+          }
+
+          document.getElementById('modal-detalhes').classList.remove('hidden');
+      } catch (e) { console.error(e); }
+  }
+
+  // ==========================================
+  // 6. UTILITÁRIOS (Datas e Abas)
+  // ==========================================
+  function getTituloPuro(desc) { return String(desc || "").replace(/\(Rendimento\)|\(Prejuízo\)|\(Resgate\)|\(Saída\)|\(Envio para Corretora\)|\(Resgate da Corretora\)/g, "").trim(); }
+  function getDataHojeBR() { const h = new Date(); return `${String(h.getDate()).padStart(2, '0')}/${String(h.getMonth() + 1).padStart(2, '0')}/${h.getFullYear()}`; }
+  function mascaraData(input) { let v = input.value.replace(/\D/g, ''); if (v.length > 2) v = v.replace(/^(\d{2})(\d)/, '$1/$2'); if (v.length > 4) v = v.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3'); input.value = v; }
+  function validarCampos(ids) { let e = false; ids.forEach(id => { const el = document.getElementById(id); if (!el || !el.value) { if(el) el.classList.add('animate-shake', 'border-red-500'); e = true; } else el.classList.remove('border-red-500', 'animate-shake'); }); return !e; }
+
+  function setTipoResultado(tipo) {
+      document.getElementById('rd-tipo').value = tipo;
+      const btnR = document.getElementById('btn-tipo-rend');
+      const btnP = document.getElementById('btn-tipo-prej');
+      const borda = document.getElementById('borda-modal-resultado');
+      if (tipo === 'RENDIMENTO') {
+          btnR.className = "flex-1 py-3 rounded-lg font-bold text-xs uppercase border-2 border-green-500 bg-green-50 text-green-700 shadow-sm";
+          btnP.className = "flex-1 py-3 rounded-lg font-bold text-xs uppercase border-2 border-transparent bg-gray-100 text-gray-400";
+          borda.style.borderTopColor = "#22c55e";
+      } else {
+          btnP.className = "flex-1 py-3 rounded-lg font-bold text-xs uppercase border-2 border-red-500 bg-red-50 text-red-700 shadow-sm";
+          btnR.className = "flex-1 py-3 rounded-lg font-bold text-xs uppercase border-2 border-transparent bg-gray-100 text-gray-400";
+          borda.style.borderTopColor = "#ef4444";
+      }
+  }
+
+  function alternarAba(aba) {
+      const isG = (aba === 'grafico');
+      document.getElementById('aba-btn-grafico').className = isG ? "flex-1 py-4 font-bold text-sm uppercase border-b-4 border-blue-600 text-blue-600" : "flex-1 py-4 font-bold text-sm uppercase border-b-4 border-transparent text-gray-500";
+      document.getElementById('aba-btn-lista').className = !isG ? "flex-1 py-4 font-bold text-sm uppercase border-b-4 border-blue-600 text-blue-600" : "flex-1 py-4 font-bold text-sm uppercase border-b-4 border-transparent text-gray-500";
+
+      const cg = document.getElementById('conteudo-grafico');
+      const cl = document.getElementById('conteudo-lista');
+
+      if (isG) {
+          cg.classList.remove('hidden');
+          cl.classList.add('hidden');
+      } else {
+          cg.classList.add('hidden');
+          cl.classList.remove('hidden');
+      }
+  }
+
+</script>
 </body>
 </html>
