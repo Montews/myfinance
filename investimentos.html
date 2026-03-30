@@ -19,12 +19,9 @@
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; }
-        body, html {height: 100%; margin: 0; background-color: #f3f4f6;}
-
-        @media (min-width: 768px) {body, html {overflow: hidden;}}
-
-
+        /* Limpeza do scroll duplicado, mantendo a regra correta para mobile/desktop */
+        body, html { height: 100%; margin: 0; background-color: #f3f4f6; }
+        @media (min-width: 768px) { body, html { overflow: hidden; } }
 
         .input-padrao { height: 60px; font-size: 1.25rem; font-weight: 900; text-align: center; border-radius: 0.75rem; border: 2px solid #e2e8f0; width: 100%; outline: none; transition: all 0.2s; }
         .input-padrao:focus { border-color: #2563eb; background-color: #f8fafc; }
@@ -78,7 +75,6 @@
                     </div>
                     <span class="text-gray-500 font-black text-[10px] lg:text-sm uppercase">Adicionar Aporte</span>
                 </button>
-
             </div>
         </section>
     </div>
@@ -140,10 +136,16 @@
 
 <div id="modal-detalhes" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center modal-z p-4" onclick="if(event.target === this) fecharModais()">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
-        <div class="bg-slate-800 p-6 text-white flex justify-between items-start">
-            <div><h3 class="text-blue-400 font-bold uppercase text-xs tracking-widest" id="det-conta-nome"></h3><h2 class="text-2xl font-black mt-1" id="det-titulo-nome"></h2></div>
-            <button onclick="fecharModais()"><i class="fas fa-times text-2xl text-gray-400 hover:text-white transition-colors"></i></button>
+
+        <div class="bg-slate-800 p-6 text-white flex justify-between items-start gap-4">
+            <h2 class="text-base md:text-lg font-black leading-tight flex flex-wrap items-center gap-2">
+                <span id="det-conta-nome" class="text-blue-400"></span>
+                <span class="text-gray-400 font-medium">-</span>
+                <span id="det-titulo-nome" class="text-white"></span>
+            </h2>
+            <button onclick="fecharModais()" class="shrink-0 ml-2"><i class="fas fa-times text-4xl text-gray-400 hover:text-white transition-colors"></i></button>
         </div>
+
         <div class="flex border-b bg-slate-50">
             <button onclick="alternarAba('lista')" id="aba-btn-lista" class="flex-1 py-4 font-bold text-sm uppercase border-b-4">Histórico</button>
             <button onclick="alternarAba('grafico')" id="aba-btn-grafico" class="flex-1 py-4 font-bold text-sm uppercase border-b-4">Gráfico</button>
@@ -151,12 +153,12 @@
 
         <div id="conteudo-grafico" class="flex-1 p-4 md:p-8 relative bg-white flex flex-col hidden">
             <div id="grafico-paginacao" class="flex justify-between items-center mb-4 shrink-0">
-                <button onclick="moverGrafico(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black uppercase rounded-lg transition-colors">Anterior</button>
+                <button onclick="moverGrafico(-1)" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-black uppercase rounded-lg transition-colors shadow-sm">Anterior</button>
                 <div class="flex flex-col items-center">
-                    <span id="txt-evolucao" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center">Evolução</span>
-                    <button onclick="toggleMostrarTudoGrafico()" id="btn-mostrar-tudo" class="text-[9px] text-blue-600 font-black uppercase tracking-widest mt-1 hover:underline cursor-pointer">MOSTRAR TUDO</button>
+                    <span id="txt-evolucao" class="text-sm md:text-base text-gray-400 font-bold uppercase tracking-widest text-center">Evolução</span>
+                    <button onclick="toggleMostrarTudoGrafico()" id="btn-mostrar-tudo" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg text-[10px] uppercase font-black tracking-widest mt-2 transition-colors shadow-sm">MOSTRAR TUDO</button>
                 </div>
-                <button onclick="moverGrafico(1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black uppercase rounded-lg transition-colors">Próximo</button>
+                <button onclick="moverGrafico(1)" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-black uppercase rounded-lg transition-colors shadow-sm">Próximo</button>
             </div>
             <div class="flex-1 min-h-0 relative"><canvas id="grafico-evolucao"></canvas></div>
         </div>
@@ -178,7 +180,13 @@
             </div>
 
             <table class="w-full text-left">
-                <thead class="bg-gray-50 sticky top-0 border-b shadow-sm"><tr><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Data</th><th class="p-4 text-[10px] font-bold uppercase text-gray-400">Tipo</th><th class="p-4 text-right text-[10px] font-bold uppercase text-gray-400">Valor</th></tr></thead>
+                <thead class="bg-gray-50 sticky top-0 border-b shadow-sm">
+                <tr>
+                    <th class="p-4 text-[13px] md:text-sm font-bold uppercase text-gray-500">Data</th>
+                    <th class="p-4 text-[13px] md:text-sm font-bold uppercase text-gray-500">Tipo</th>
+                    <th class="p-4 text-right text-[13px] md:text-sm font-bold uppercase text-gray-500">Valor (R$)</th>
+                </tr>
+                </thead>
                 <tbody id="lista-historico" class="divide-y divide-gray-100"></tbody>
             </table>
         </div>
@@ -192,7 +200,7 @@
     </div>
 </div>
 
-<div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-1050"></div>
+<div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-"></div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby7cBP4XB5-ldRA9P07qLd0onh6GIx79FP_xfK2KHE5GnYogm1xgP-Ft9iy-6z3DkJE_A/exec";
@@ -203,16 +211,12 @@
     let isDatabaseLoaded = false;
     let statusTimeout1, statusTimeout2;
 
-    // Variáveis Globais do Gráfico
     let globalGraphLabels = [];
     let globalGraphData = [];
     let globalGraphMotivos = [];
     let currentGraphIndex = 0;
     let mostrarTodosOsDados = false;
 
-    // ==========================================
-    // 1. INICIALIZAÇÃO
-    // ==========================================
     window.addEventListener('load', async () => {
         atualizarStatus('conectando');
         await carregarContas();
@@ -273,8 +277,15 @@
         }
     }
 
+    // ALTERAÇÃO 1: Limite de 3 Push Notifications
     function notify(tipo, msg) {
         const container = document.getElementById('toast-container');
+
+        // Verifica se já existem 3 toasts (ignora o clique se sim)
+        if (container.children.length >= 3) {
+            return;
+        }
+
         const toast = document.createElement('div');
         toast.className = `${tipo === 'sucesso' ? 'bg-green-600' : 'bg-red-600'} text-white px-8 py-3 rounded-xl shadow-2xl font-black text-[10px] uppercase animate-bounce mt-2`;
         toast.innerText = msg;
@@ -282,9 +293,6 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    // ==========================================
-    // 2. FUNÇÕES DE MODAL E MÁSCARAS
-    // ==========================================
     function fecharModais() {
         ['modal-aporte', 'modal-resultado', 'modal-detalhes', 'modal-sacar'].forEach(id => {
             const el = document.getElementById(id);
@@ -360,9 +368,6 @@
         return `${ano}-${mes}-${dia}`;
     }
 
-    // ==========================================
-    // 3. LANÇAMENTOS E COMUNICAÇÃO (APIs)
-    // ==========================================
     async function enviarParaGoogle(dados) {
         const response = await fetch(`${API_URL}?tipo=criar_gasto`, {
             method: 'POST',
@@ -457,9 +462,6 @@
         finally { btn.innerText = "Confirmar Resgate"; btn.disabled = false; }
     }
 
-    // ==========================================
-    // 4. CÁLCULOS E RENDERIZAÇÃO DE DASHBOARD
-    // ==========================================
     function calcularSaldosAtuais() {
         let resumo = {};
         dadosBrutosGlobais.forEach(item => {
@@ -526,7 +528,7 @@
         if (globalLucro > 0) {
             cardH.className = baseClass + "border-emerald-500";
         } else if (globalLucro < 0) {
-            cardH.className = baseClass + "border-red-500";
+            cardH.className = baseClass + "border-slate-200";
         } else {
             cardH.className = baseClass + "border-slate-200";
         }
@@ -548,25 +550,31 @@
             const valorLimpo = Math.abs(pct).toFixed(2);
             const tEsc = valores.titulo.replace(/'/g, "\\'");
 
+            // ALTERAÇÃO 7: Caixinhas maiores, botão engrenagem adicionado
             html += `
             <div onclick="abrirModalDetalhes('${valores.conta}', '${tEsc}', ${valores.total})" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:-translate-y-1 cursor-pointer group">
-                <div class="bg-slate-50 p-4 border-b group-hover:bg-blue-50 transition-colors">
-                    <h4 class="font-bold text-slate-800 uppercase text-[10px] tracking-widest">${valores.conta}</h4>
-                    <p class="text-xs font-bold truncate">${valores.titulo}</p>
+                <div class="bg-slate-50 p-4 border-b group-hover:bg-blue-50 transition-colors flex justify-between items-start gap-2">
+                    <div class="overflow-hidden">
+                        <h4 class="font-black text-slate-800 uppercase text-xs md:text-sm tracking-widest">${valores.conta}</h4>
+                        <p class="text-sm md:text-base font-bold truncate text-slate-600">${valores.titulo}</p>
+                    </div>
+                    <button onclick="event.stopPropagation(); alert('Botão de Configuração clicado!')" class="text-gray-400 hover:text-slate-700 transition-colors shrink-0">
+                        <i class="fas fa-cog text-xl"></i>
+                    </button>
                 </div>
                 <div class="p-6 flex-1 text-center flex flex-col justify-center">
-                    <p class="text-[9px] text-gray-400 font-bold uppercase mb-1">Saldo Atual</p>
-                    <h2 class="text-2xl font-black text-slate-800">R$ ${valores.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
+                    <p class="text-xs md:text-sm text-gray-500 font-bold uppercase mb-1">Saldo Atual</p>
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-800">R$ ${valores.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
                     <p class="text-[18px] font-black mt-2 ${corPct}"><span class="font-black">${seta}</span> ${valorLimpo}%</p>
                 </div>
 
                 <div class="flex">
                     <button onclick="event.stopPropagation(); abrirModalResultado('${valores.conta}', '${tEsc}')"
-                        class="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-white font-black text-[11px] uppercase tracking-tighter transition-colors">
+                        class="flex-1 py-4 md:py-5 bg-slate-800 hover:bg-slate-700 text-white font-black text-sm md:text-base uppercase tracking-tighter transition-colors">
                         Resultado
                     </button>
                     <button onclick="event.stopPropagation(); abrirModalSacar('${valores.conta}', '${tEsc}', ${valores.total})"
-                        class="flex-1 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-[11px] uppercase tracking-tighter transition-colors border-l border-white/10">
+                        class="flex-1 py-4 md:py-5 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm md:text-base uppercase tracking-tighter transition-colors border-l border-white/10">
                         Sacar
                     </button>
                 </div>
@@ -575,9 +583,6 @@
         grid.innerHTML = html;
     }
 
-    // ==========================================
-    // 5. HISTÓRICO E GRÁFICO PAGINADO
-    // ==========================================
 function renderizarGraficoPaginado() {
       let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
       let labelsVisiveis, dataVisiveis, motivosVisiveis;
@@ -644,13 +649,8 @@ function renderizarGraficoPaginado() {
                   y: {
                       ticks: {
                           font: { size: 15, weight: 'bold' },
-                          // MUDANÇA AQUI: Formatação de decimais e R$ no topo
                           callback: function(value, index, ticks) {
-                              let valorFormatado = value.toLocaleString('pt-BR', {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2
-                              });
-                              // index === ticks.length - 1 é o valor mais alto do eixo Y
+                              let valorFormatado = value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                               return (index === ticks.length - 1) ? 'R$ ' + valorFormatado : valorFormatado;
                           }
                       }
@@ -660,6 +660,7 @@ function renderizarGraficoPaginado() {
           }
       });
   }
+
     function moverGrafico(dir) {
         let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
         let maxIndex = Math.max(0, globalGraphLabels.length - limiteLimpo);
@@ -681,6 +682,8 @@ function renderizarGraficoPaginado() {
     function abrirModalDetalhes(conta, titulo, total) {
         try {
             const titR = String(titulo).replace(/&quot;/g, '"');
+
+            // Lógica de manipulação agora alimenta tags SPAN dentro do cabeçalho flex-wrap
             document.getElementById('det-conta-nome').innerText = conta;
             document.getElementById('det-titulo-nome').innerText = titR;
 
@@ -717,15 +720,15 @@ function renderizarGraficoPaginado() {
                 dataPoints.push(saldoAc.toFixed(2));
                 motivos.push(op);
 
+                // ALTERAÇÃO 3 e 4: Removido R$ do valor e Fonte Menor (text-xs e text-sm)
                 htmlRows.push(`
-                    <tr class="border-b">
-                        <td class="p-4 text-[15px] font-bold font-mono">${i.data}</td>
-                        <td class="p-4 text-[16px] font-black uppercase ${cor}">${op}</td>
-                        <td class="p-4 text-right text-[18px] font-black ${cor}">${sin} R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-4 text-xs font-bold font-mono text-slate-600">${i.data}</td>
+                        <td class="p-4 text-xs font-black uppercase ${cor}">${op}</td>
+                        <td class="p-4 text-right text-sm font-black ${cor}">${sin} ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
                     </tr>`);
             });
 
-            // Popula Valores do Resumo Histórico
             document.getElementById('hist-investido').innerText = `R$ ${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('hist-valor-lucro').innerText = `R$ ${totalLucroPerda.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
@@ -738,7 +741,6 @@ function renderizarGraficoPaginado() {
 
             document.getElementById('lista-historico').innerHTML = htmlRows.reverse().join('');
 
-            // Verifica se é aplicativo para sumir com botão do Gráfico
             const isAplicativo = conta.toLowerCase().includes('aplicativo') || titR.toLowerCase().includes('aplicativo');
             const abaGraficoBtn = document.getElementById('aba-btn-grafico');
 
@@ -748,10 +750,8 @@ function renderizarGraficoPaginado() {
                 abaGraficoBtn.style.display = 'block';
             }
 
-            // Sempre abre por padrão na Aba Lista (Histórico)
             alternarAba('lista');
 
-            // Configuração do Gráfico
             globalGraphLabels = labels;
             globalGraphData = dataPoints;
             globalGraphMotivos = motivos;
@@ -768,9 +768,6 @@ function renderizarGraficoPaginado() {
         } catch (e) { console.error(e); }
     }
 
-    // ==========================================
-    // 6. UTILITÁRIOS (Datas e Abas)
-    // ==========================================
     function getTituloPuro(desc) { return String(desc || "").replace(/\(Rendimento\)|\(Prejuízo\)|\(Resgate\)|\(Saída\)|\(Envio para Corretora\)|\(Resgate da Corretora\)/g, "").trim(); }
     function getDataHojeBR() { const h = new Date(); return `${String(h.getDate()).padStart(2, '0')}/${String(h.getMonth() + 1).padStart(2, '0')}/${h.getFullYear()}`; }
     function mascaraData(input) { let v = input.value.replace(/\D/g, ''); if (v.length > 2) v = v.replace(/^(\d{2})(\d)/, '$1/$2'); if (v.length > 4) v = v.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3'); input.value = v; }
@@ -808,43 +805,44 @@ function renderizarGraficoPaginado() {
             cl.classList.remove('hidden');
         }
     }
+</script>
 
+<script>
+    // Script do seu ambiente de desenvolvimento mantido!
+    (function() {
+      var ws = new WebSocket('ws://' + window.location.host +
+                 '/jb-server-page?reloadMode=RELOAD_ON_SAVE&'+
+                 'referrer=' + encodeURIComponent(window.location.pathname));
+      ws.onmessage = function (msg) {
+          if (msg.data === 'reload') {
+              window.location.reload();
+          }
+          if (msg.data.startsWith('update-css ')) {
+              var messageId = msg.data.substring(11);
+              var links = document.getElementsByTagName('link');
+              for (var i = 0; i < links.length; i++) {
+                  var link = links[i];
+                  if (link.rel !== 'stylesheet') continue;
+                  var clonedLink = link.cloneNode(true);
+                  var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/, "$1jbUpdateLinksId=" + messageId);
+                  if (newHref !== link.href) {
+                    clonedLink.href = newHref;
+                  }
+                  else {
+                    var indexOfQuest = newHref.indexOf('?');
+                    if (indexOfQuest >= 0) {
+                      clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId=' + messageId + '&' +
+                                        newHref.substring(indexOfQuest + 1);
+                    }
+                    else {
+                      clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId;
+                    }
+                  }
+                  link.replaceWith(clonedLink);
+              }
+          }
+      };
+    })();
 </script>
 </body>
-</html><script>
-(function() {
-  var ws = new WebSocket('ws://' + window.location.host + 
-             '/jb-server-page?reloadMode=RELOAD_ON_SAVE&'+
-             'referrer=' + encodeURIComponent(window.location.pathname));
-  ws.onmessage = function (msg) {
-      if (msg.data === 'reload') {
-          window.location.reload();
-      }
-      if (msg.data.startsWith('update-css ')) {
-          var messageId = msg.data.substring(11);
-          var links = document.getElementsByTagName('link');
-          for (var i = 0; i < links.length; i++) {
-              var link = links[i];
-              if (link.rel !== 'stylesheet') continue;
-              var clonedLink = link.cloneNode(true);
-              var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/, "$1jbUpdateLinksId=" + messageId);
-              if (newHref !== link.href) {
-                clonedLink.href = newHref;
-              }
-              else {
-                var indexOfQuest = newHref.indexOf('?');
-                if (indexOfQuest >= 0) {
-                  // to support ?foo#hash 
-                  clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId=' + messageId + '&' + 
-                                    newHref.substring(indexOfQuest + 1);
-                }
-                else {
-                  clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId;
-                }
-              }
-              link.replaceWith(clonedLink);
-          }
-      }
-  };
-})();
-</script>
+</html>
