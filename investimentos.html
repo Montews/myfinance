@@ -20,6 +20,11 @@
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; }
+        body, html {height: 100%; margin: 0; background-color: #f3f4f6;}
+
+        @media (min-width: 768px) {body, html {overflow: hidden;}}
+
+
 
         .input-padrao { height: 60px; font-size: 1.25rem; font-weight: 900; text-align: center; border-radius: 0.75rem; border: 2px solid #e2e8f0; width: 100%; outline: none; transition: all 0.2s; }
         .input-padrao:focus { border-color: #2563eb; background-color: #f8fafc; }
