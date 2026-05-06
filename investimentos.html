@@ -38,19 +38,12 @@
         <i class="fas fa-wallet"></i> <span class="text-white">MyFinance</span>
     </div>
 
-<<<<<<< HEAD
     <nav class="flex-1 p-4 mt-20 lg:mt-0 space-y-2 text-sm font-black uppercase">
         <a href="index.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-list-ul mr-2"></i> Transações</a>
         <a href="investimentos.html" class="block p-3 rounded bg-blue-600 shadow"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
         <a href="categorias.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-tags mr-2"></i> Categorias</a>
+        <a href="faturas.html" class="block p-3 rounded hover:bg-slate-700 "><i class="fas fa-file-invoice-dollar mr-2"></i> Faturas</a>  </nav>
     </nav>
-=======
-  <nav class="flex-1 p-4 mt-20 lg:mt-0 space-y-2 text-sm font-black uppercase">
-    <a href="index.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-list-ul mr-2"></i> Transações</a>
-    <a href="investimentos.html" class="block p-3 rounded bg-blue-600 shadow"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
-    <a href="categorias.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-tags mr-2"></i> Categorias</a>
-    <a href="faturas.html" class="block p-3 rounded hover:bg-slate-700 "><i class="fas fa-file-invoice-dollar mr-2"></i> Faturas</a>  </nav>
->>>>>>> af3fc30 (nova pagina)
 </aside>
 
 <main class="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -211,11 +204,7 @@
 <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-"></div>
 
 <script>
-<<<<<<< HEAD
-    const API_URL = "https://script.google.com/macros/s/AKfycby7cBP4XB5-ldRA9P07qLd0onh6GIx79FP_xfK2KHE5GnYogm1xgP-Ft9iy-6z3DkJE_A/exec";
-=======
-  const API_URL = "https://script.google.com/macros/s/AKfycbycfNgSkSW9oDJmdnvh0MTtVGPXgN29i9Yvrvp1rAxj6A0QoM16JHV0HzlPjErBK3pi/exec";
->>>>>>> af3fc30 (nova pagina)
+    const API_URL = "https://script.google.com/macros/s/AKfycbwUyLEBsyFDj8wWTMcDCyMUMqrGGHN8wCKV6PfGET8iyAL2IvCSFTxL5sAByXy3AH4/exec";
 
     let listaContas = [];
     let dadosBrutosGlobais = [];
@@ -223,22 +212,12 @@
     let isDatabaseLoaded = false;
     let statusTimeout1, statusTimeout2;
 
-<<<<<<< HEAD
-=======
-    // Variáveis Globais do Gráfico
->>>>>>> af3fc30 (nova pagina)
     let globalGraphLabels = [];
     let globalGraphData = [];
     let globalGraphMotivos = [];
     let currentGraphIndex = 0;
     let mostrarTodosOsDados = false;
 
-<<<<<<< HEAD
-=======
-    // ==========================================
-    // 1. INICIALIZAÇÃO
-    // ==========================================
->>>>>>> af3fc30 (nova pagina)
     window.addEventListener('load', async () => {
         atualizarStatus('conectando');
         await carregarContas();
@@ -299,7 +278,6 @@
         }
     }
 
-<<<<<<< HEAD
     // ALTERAÇÃO 1: Limite de 3 Push Notifications
     function notify(tipo, msg) {
         const container = document.getElementById('toast-container');
@@ -309,10 +287,6 @@
             return;
         }
 
-=======
-    function notify(tipo, msg) {
-        const container = document.getElementById('toast-container');
->>>>>>> af3fc30 (nova pagina)
         const toast = document.createElement('div');
         toast.className = `${tipo === 'sucesso' ? 'bg-green-600' : 'bg-red-600'} text-white px-8 py-3 rounded-xl shadow-2xl font-black text-[10px] uppercase animate-bounce mt-2`;
         toast.innerText = msg;
@@ -320,12 +294,6 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-<<<<<<< HEAD
-=======
-    // ==========================================
-    // 2. FUNÇÕES DE MODAL E MÁSCARAS
-    // ==========================================
->>>>>>> af3fc30 (nova pagina)
     function fecharModais() {
         ['modal-aporte', 'modal-resultado', 'modal-detalhes', 'modal-sacar'].forEach(id => {
             const el = document.getElementById(id);
@@ -401,12 +369,6 @@
         return `${ano}-${mes}-${dia}`;
     }
 
-<<<<<<< HEAD
-=======
-    // ==========================================
-    // 3. LANÇAMENTOS E COMUNICAÇÃO (APIs)
-    // ==========================================
->>>>>>> af3fc30 (nova pagina)
     async function enviarParaGoogle(dados) {
         const response = await fetch(`${API_URL}?tipo=criar_gasto`, {
             method: 'POST',
@@ -501,12 +463,6 @@
         finally { btn.innerText = "Confirmar Resgate"; btn.disabled = false; }
     }
 
-<<<<<<< HEAD
-=======
-    // ==========================================
-    // 4. CÁLCULOS E RENDERIZAÇÃO DE DASHBOARD
-    // ==========================================
->>>>>>> af3fc30 (nova pagina)
     function calcularSaldosAtuais() {
         let resumo = {};
         dadosBrutosGlobais.forEach(item => {
@@ -573,11 +529,7 @@
         if (globalLucro > 0) {
             cardH.className = baseClass + "border-emerald-500";
         } else if (globalLucro < 0) {
-<<<<<<< HEAD
             cardH.className = baseClass + "border-slate-200";
-=======
-            cardH.className = baseClass + "border-red-500";
->>>>>>> af3fc30 (nova pagina)
         } else {
             cardH.className = baseClass + "border-slate-200";
         }
@@ -599,7 +551,6 @@
             const valorLimpo = Math.abs(pct).toFixed(2);
             const tEsc = valores.titulo.replace(/'/g, "\\'");
 
-<<<<<<< HEAD
             // ALTERAÇÃO 7: Caixinhas maiores, botão engrenagem adicionado
             html += `
             <div onclick="abrirModalDetalhes('${valores.conta}', '${tEsc}', ${valores.total})" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:-translate-y-1 cursor-pointer group">
@@ -615,35 +566,16 @@
                 <div class="p-6 flex-1 text-center flex flex-col justify-center">
                     <p class="text-xs md:text-sm text-gray-500 font-bold uppercase mb-1">Saldo Atual</p>
                     <h2 class="text-3xl md:text-4xl font-black text-slate-800">R$ ${valores.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
-=======
-            html += `
-            <div onclick="abrirModalDetalhes('${valores.conta}', '${tEsc}', ${valores.total})" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:-translate-y-1 cursor-pointer group">
-                <div class="bg-slate-50 p-4 border-b group-hover:bg-blue-50 transition-colors">
-                    <h4 class="font-bold text-slate-800 uppercase text-[10px] tracking-widest">${valores.conta}</h4>
-                    <p class="text-xs font-bold truncate">${valores.titulo}</p>
-                </div>
-                <div class="p-6 flex-1 text-center flex flex-col justify-center">
-                    <p class="text-[9px] text-gray-400 font-bold uppercase mb-1">Saldo Atual</p>
-                    <h2 class="text-2xl font-black text-slate-800">R$ ${valores.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
->>>>>>> af3fc30 (nova pagina)
                     <p class="text-[18px] font-black mt-2 ${corPct}"><span class="font-black">${seta}</span> ${valorLimpo}%</p>
                 </div>
 
                 <div class="flex">
                     <button onclick="event.stopPropagation(); abrirModalResultado('${valores.conta}', '${tEsc}')"
-<<<<<<< HEAD
                         class="flex-1 py-4 md:py-5 bg-slate-800 hover:bg-slate-700 text-white font-black text-sm md:text-base uppercase tracking-tighter transition-colors">
                         Resultado
                     </button>
                     <button onclick="event.stopPropagation(); abrirModalSacar('${valores.conta}', '${tEsc}', ${valores.total})"
                         class="flex-1 py-4 md:py-5 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm md:text-base uppercase tracking-tighter transition-colors border-l border-white/10">
-=======
-                        class="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-white font-black text-[11px] uppercase tracking-tighter transition-colors">
-                        Resultado
-                    </button>
-                    <button onclick="event.stopPropagation(); abrirModalSacar('${valores.conta}', '${tEsc}', ${valores.total})"
-                        class="flex-1 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-[11px] uppercase tracking-tighter transition-colors border-l border-white/10">
->>>>>>> af3fc30 (nova pagina)
                         Sacar
                     </button>
                 </div>
@@ -652,7 +584,6 @@
         grid.innerHTML = html;
     }
 
-<<<<<<< HEAD
 function renderizarGraficoPaginado() {
       let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
       let labelsVisiveis, dataVisiveis, motivosVisiveis;
@@ -730,64 +661,6 @@ function renderizarGraficoPaginado() {
           }
       });
   }
-=======
-    // ==========================================
-    // 5. HISTÓRICO E GRÁFICO PAGINADO
-    // ==========================================
-    function renderizarGraficoPaginado() {
-        let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
-        let labelsVisiveis, dataVisiveis, motivosVisiveis;
-
-        if (mostrarTodosOsDados) {
-            labelsVisiveis = globalGraphLabels;
-            dataVisiveis = globalGraphData;
-            motivosVisiveis = globalGraphMotivos;
-            document.getElementById('txt-evolucao').innerText = "Evolução (Todo o Período)";
-            document.getElementById('btn-mostrar-tudo').innerText = "MOSTRAR PAGINADO";
-        } else {
-            labelsVisiveis = globalGraphLabels.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
-            dataVisiveis = globalGraphData.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
-            motivosVisiveis = globalGraphMotivos.slice(currentGraphIndex, currentGraphIndex + limiteLimpo);
-            document.getElementById('txt-evolucao').innerText = `Evolução (Até ${limiteLimpo} pontos)`;
-            document.getElementById('btn-mostrar-tudo').innerText = "MOSTRAR TUDO";
-        }
-
-        const ctx = document.getElementById('grafico-evolucao').getContext('2d');
-        if (meuGrafico) meuGrafico.destroy();
-
-        meuGrafico = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labelsVisiveis,
-                datasets: [{
-                    data: dataVisiveis,
-                    fill: true,
-                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                    tension: 0.3,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    pointBackgroundColor: '#2563eb',
-                    segment: {
-                        borderColor: ctx => {
-                            const tipo = motivosVisiveis[ctx.p1DataIndex];
-                            if (tipo === "Lucro") return '#22c55e';
-                            if (tipo === "Perda") return '#ef4444';
-                            if (tipo === "Saque") return '#f97316';
-                            if (tipo === "Aporte") return '#2563eb';
-                            return '#2563eb';
-                        },
-                        borderWidth: 5
-                    }
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: true, displayColors: false, backgroundColor: 'rgba(15, 23, 42, 0.95)', padding: 15, titleFont: { size: 18 }, bodyFont: { size: 24, weight: 'black' }, callbacks: { label: (c) => ' Saldo: R$ ' + parseFloat(c.parsed.y).toLocaleString('pt-BR', {minimumFractionDigits: 2}) } } },
-                scales: { y: { ticks: { font: { size: 15, weight: 'bold' }, callback: (v) => 'R$ ' + v.toLocaleString('pt-BR') } }, x: { ticks: { font: { size: 15, weight: 'bold' } } } }
-            }
-        });
-    }
->>>>>>> af3fc30 (nova pagina)
 
     function moverGrafico(dir) {
         let limiteLimpo = window.innerWidth <= 768 ? 3 : 5;
@@ -810,11 +683,8 @@ function renderizarGraficoPaginado() {
     function abrirModalDetalhes(conta, titulo, total) {
         try {
             const titR = String(titulo).replace(/&quot;/g, '"');
-<<<<<<< HEAD
 
             // Lógica de manipulação agora alimenta tags SPAN dentro do cabeçalho flex-wrap
-=======
->>>>>>> af3fc30 (nova pagina)
             document.getElementById('det-conta-nome').innerText = conta;
             document.getElementById('det-titulo-nome').innerText = titR;
 
@@ -851,7 +721,6 @@ function renderizarGraficoPaginado() {
                 dataPoints.push(saldoAc.toFixed(2));
                 motivos.push(op);
 
-<<<<<<< HEAD
                 // ALTERAÇÃO 3 e 4: Removido R$ do valor e Fonte Menor (text-xs e text-sm)
                 htmlRows.push(`
                     <tr class="border-b hover:bg-slate-50">
@@ -861,17 +730,6 @@ function renderizarGraficoPaginado() {
                     </tr>`);
             });
 
-=======
-                htmlRows.push(`
-                    <tr class="border-b">
-                        <td class="p-4 text-[15px] font-bold font-mono">${i.data}</td>
-                        <td class="p-4 text-[16px] font-black uppercase ${cor}">${op}</td>
-                        <td class="p-4 text-right text-[18px] font-black ${cor}">${sin} R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                    </tr>`);
-            });
-
-            // Popula Valores do Resumo Histórico
->>>>>>> af3fc30 (nova pagina)
             document.getElementById('hist-investido').innerText = `R$ ${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('hist-valor-lucro').innerText = `R$ ${totalLucroPerda.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
@@ -884,10 +742,6 @@ function renderizarGraficoPaginado() {
 
             document.getElementById('lista-historico').innerHTML = htmlRows.reverse().join('');
 
-<<<<<<< HEAD
-=======
-            // Verifica se é aplicativo para sumir com botão do Gráfico
->>>>>>> af3fc30 (nova pagina)
             const isAplicativo = conta.toLowerCase().includes('aplicativo') || titR.toLowerCase().includes('aplicativo');
             const abaGraficoBtn = document.getElementById('aba-btn-grafico');
 
@@ -897,15 +751,8 @@ function renderizarGraficoPaginado() {
                 abaGraficoBtn.style.display = 'block';
             }
 
-<<<<<<< HEAD
             alternarAba('lista');
 
-=======
-            // Sempre abre por padrão na Aba Lista (Histórico)
-            alternarAba('lista');
-
-            // Configuração do Gráfico
->>>>>>> af3fc30 (nova pagina)
             globalGraphLabels = labels;
             globalGraphData = dataPoints;
             globalGraphMotivos = motivos;
@@ -922,12 +769,6 @@ function renderizarGraficoPaginado() {
         } catch (e) { console.error(e); }
     }
 
-<<<<<<< HEAD
-=======
-    // ==========================================
-    // 6. UTILITÁRIOS (Datas e Abas)
-    // ==========================================
->>>>>>> af3fc30 (nova pagina)
     function getTituloPuro(desc) { return String(desc || "").replace(/\(Rendimento\)|\(Prejuízo\)|\(Resgate\)|\(Saída\)|\(Envio para Corretora\)|\(Resgate da Corretora\)/g, "").trim(); }
     function getDataHojeBR() { const h = new Date(); return `${String(h.getDate()).padStart(2, '0')}/${String(h.getMonth() + 1).padStart(2, '0')}/${h.getFullYear()}`; }
     function mascaraData(input) { let v = input.value.replace(/\D/g, ''); if (v.length > 2) v = v.replace(/^(\d{2})(\d)/, '$1/$2'); if (v.length > 4) v = v.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3'); input.value = v; }
@@ -965,7 +806,6 @@ function renderizarGraficoPaginado() {
             cl.classList.remove('hidden');
         }
     }
-<<<<<<< HEAD
 </script>
 
 <script>
@@ -1004,9 +844,6 @@ function renderizarGraficoPaginado() {
           }
       };
     })();
-=======
-
->>>>>>> af3fc30 (nova pagina)
 </script>
 </body>
 </html>
