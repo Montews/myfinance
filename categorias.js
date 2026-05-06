@@ -1,6 +1,6 @@
 // URL ATUALIZADA
-const API_URL = "https://script.google.com/macros/s/AKfycbwEs5RX0FpcN8AR8FIG5Y5K1Qkojox2Ke8_o8MTKQMhPqQO6J6ZfVXOlF7mIIKkuYXxVg/exec";
-const POST_API_URL = "https://script.google.com/macros/s/AKfycbwEs5RX0FpcN8AR8FIG5Y5K1Qkojox2Ke8_o8MTKQMhPqQO6J6ZfVXOlF7mIIKkuYXxVg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwUyLEBsyFDj8wWTMcDCyMUMqrGGHN8wCKV6PfGET8iyAL2IvCSFTxL5sAByXy3AH4/exec";
+const POST_API_URL = "https://script.google.com/macros/s/AKfycbwUyLEBsyFDj8wWTMcDCyMUMqrGGHN8wCKV6PfGET8iyAL2IvCSFTxL5sAByXy3AH4/exec";
 
 let dadosBrutos = [];
 let listaContasAtuais = [];
