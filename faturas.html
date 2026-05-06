@@ -202,10 +202,12 @@
                 <thead class="bg-gray-50 sticky top-0 border-b shadow-sm z-10"><tr>
                     <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-[10px] sm:text-xs font-black uppercase text-gray-400">Data</th>
                     <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-[10px] sm:text-xs font-black uppercase text-gray-400">Local / Descrição</th>
-                    <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-center text-[10px] sm:text-xs font-black uppercase text-gray-400 hidden md:table-cell">Parcela</th>
+                    <!-- Removido o hidden da Parcela para aparecer no celular -->
+                    <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-center text-[10px] sm:text-xs font-black uppercase text-gray-400">Parcela</th>
                     <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-center text-[10px] sm:text-xs font-black uppercase text-gray-400 w-24 sm:w-32">Valor</th>
                     <th class="py-2 px-2 sm:py-1.5 sm:px-3 text-[10px] sm:text-xs font-black uppercase text-gray-400 hidden sm:table-cell">Categoria</th>
-                    <th class="py-2 px-2 sm:py-2.5 sm:px-3 w-16 sm:w-24 hidden sm:table-cell text-right">Ações</th>
+                    <!-- Adicionado ID na coluna de ações -->
+                    <th id="th-acoes" class="py-2 px-2 sm:py-1.5 sm:px-3 w-16 sm:w-24 hidden sm:table-cell text-right">Ações</th>
                 </tr></thead>
                 <tbody id="lista-transacoes" class="divide-y divide-gray-100 text-sm font-bold"></tbody>
             </table>
@@ -447,6 +449,24 @@
 <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[2000]"></div>
 
 <script src="faturas.js"></script>
+
+<!-- MODAL 7: CONFIRMAR EXCLUSÃO DE FATURA ZERADA -->
+<div id="modal-confirmar-delete-fatura" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModalConfirmarDeleteFatura()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col">
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="font-black text-lg text-slate-800 mb-2">Deletar Fatura?</h3>
+            <p id="txt-confirmar-delete-fatura" class="text-sm font-bold text-gray-500 mb-2"></p>
+            <p class="text-[10px] font-bold text-red-500 uppercase">Isso apagará o registro da base de dados.</p>
+        </div>
+        <div class="flex border-t border-gray-100">
+            <button onclick="fecharModalConfirmarDeleteFatura()" class="flex-1 py-4 text-xs font-black uppercase text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
+            <button onclick="efetivarDeleteFatura()" id="btn-confirmar-delete-fatura" class="flex-1 py-4 text-xs font-black uppercase text-white bg-red-600 hover:bg-red-700 transition-colors border-l border-red-700">Deletar</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

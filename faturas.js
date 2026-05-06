@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbznMspp-LOSjo_bqQAhX4Y3PHx12FDcDeFYOeo9vBIroX0UyHv0OVZoPOnD5z5-QcOu/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwUyLEBsyFDj8wWTMcDCyMUMqrGGHN8wCKV6PfGET8iyAL2IvCSFTxL5sAByXy3AH4/exec";
 
 let dadosFaturas = [];
 let faturasUrgentes = [];
@@ -157,7 +157,6 @@ function processarFaturas() {
         banner.classList.add('hidden');
     }
 }
-
 function renderizarCardPrincipal(f, atrasada, venceLogo, diaVencimento) {
     const isPago = f.status.toUpperCase() === 'PAGO';
     let classeBorda = "border-gray-100", classeRing = "", classeIcone = "fa-credit-card text-blue-500/20";
@@ -168,33 +167,43 @@ function renderizarCardPrincipal(f, atrasada, venceLogo, diaVencimento) {
     else if (isPago) { classeBorda = "border-emerald-500"; }
     else { classeBorda = "border-amber-500"; }
 
-    // NOVO: Verifica se o valor é 0 ou menor, desabilitando o botão
     const valFinal = parseFloat(f.valor_total) || 0;
-    const btnQuitarDisabled = valFinal <= 0;
+    const isZerada = valFinal <= 0;
 
+    // Adicionado outline-none para garantir que não apareça nenhuma linha de seleção
+    const btnBaseClass = "flex-1 py-4 text-[11px] font-black tracking-widest uppercase transition-colors outline-none";
+
+    // Removido os 'border-t' e 'border-red-600' que estavam causando a linha indesejada
     const btnHtmlQuitar = !isPago
-        ? (btnQuitarDisabled
-            ? `<button disabled class="flex-1 py-4 bg-gray-200 text-gray-400 border-t border-gray-300 border-l border-white/10 cursor-not-allowed transition-colors text-[10px]">Zerado</button>`
-            : `<button onclick="abrirModalPagarFatura('${f.conta}', '${f.mes_fatura}', ${f.valor_total})" class="flex-1 py-4 bg-emerald-600 text-white border-t border-emerald-600 border-l border-white/10 hover:bg-emerald-700 transition-colors">Quitar</button>`)
+        ? (isZerada
+            ? `<button onclick="abrirModalConfirmarDeleteFatura('${f.conta}', '${f.mes_fatura}')" class="${btnBaseClass} bg-red-600 text-white border-l border-white/10 hover:bg-red-700">DELETAR</button>`
+            : `<button onclick="abrirModalPagarFatura('${f.conta}', '${f.mes_fatura}', ${f.valor_total})" class="${btnBaseClass} bg-emerald-600 text-white border-l border-white/10 hover:bg-emerald-700">QUITAR</button>`)
         : '';
 
     document.getElementById('grid-bancos').innerHTML += `
         <div class="card-entry bg-white rounded-xl shadow-suave border ${classeBorda} ${classeRing} overflow-hidden flex flex-col h-full transform transition hover:-translate-y-1">
             <div class="bg-slate-50 p-4 border-b flex justify-between items-center font-black">
-                <div class="flex flex-col"><span class="text-[10px] text-slate-600 uppercase tracking-widest">${f.conta}</span><span class="text-[8px] text-gray-400 uppercase mt-0.5">${f.mes_fatura}</span></div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-600 uppercase tracking-widest">${f.conta}</span>
+                    <span class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">${f.mes_fatura}</span>
+                </div>
                 <i class="fas ${classeIcone} text-lg"></i>
             </div>
             <div class="p-6 text-center border-t-4 ${classeBorda}">
-                <p class="text-[8px] font-black text-gray-400 uppercase mb-1">Vencimento dia ${diaVencimento}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Vencimento dia ${diaVencimento}</p>
                 <h2 class="text-2xl font-black ${corTexto} italic">${formatarMoeda(valFinal)}</h2>
-                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded mt-3 inline-block ${bgLabel}">${labelStatus}</span>
+                <span class="text-[11px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg mt-3 inline-block ${bgLabel}">${labelStatus}</span>
             </div>
-            <div class="flex mt-auto font-black uppercase text-[10px]">
-                <button onclick="abrirDetalhes('${f.conta}', '${f.mes_fatura}', ${diaVencimento})" class="flex-1 py-4 bg-slate-800 text-white hover:bg-slate-700 transition-colors border-t border-slate-800">Detalhes</button>
+
+            <div class="flex mt-auto w-full">
+                <!-- Removido o 'border-t' daqui também -->
+                <button onclick="abrirDetalhes('${f.conta}', '${f.mes_fatura}', ${diaVencimento})" class="${btnBaseClass} bg-slate-800 text-white hover:bg-slate-700">DETALHES</button>
                 ${btnHtmlQuitar}
             </div>
         </div>`;
 }
+
+
 
 function fecharBannerAlerta() { document.getElementById('container-alerta').classList.add('hidden', 'dismissed'); }
 
@@ -205,9 +214,8 @@ function abrirModalAlertaAtrasadas() {
 
         const valFinal = parseFloat(f.valor_total) || 0;
         const btnHtml = valFinal <= 0
-            ? `<button disabled class="bg-gray-300 text-gray-500 font-black uppercase text-[10px] px-4 py-3 rounded-lg cursor-not-allowed">Zerado</button>`
+            ? `<button onclick="abrirModalConfirmarDeleteFatura('${f.conta}', '${f.mes_fatura}')" class="bg-red-600 hover:bg-red-700 text-white font-black uppercase text-[10px] px-4 py-3 rounded-lg shadow transition-colors">Deletar</button>`
             : `<button onclick="abrirModalPagarFatura('${f.conta}', '${f.mes_fatura}', ${f.valor_total})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] px-4 py-3 rounded-lg shadow transition-colors">Pagar Agora</button>`;
-
         return `
             <div class="p-4 rounded-xl border ${bg} flex justify-between items-center">
                 <div>
@@ -265,6 +273,51 @@ async function efetivarPagamentoFatura() {
     btn.innerText = "Confirmar Pagamento"; btn.disabled = false;
 }
 
+// Variável global para armazenar qual fatura será deletada
+let faturaDeleteAtual = null;
+
+function abrirModalConfirmarDeleteFatura(conta, mes) {
+    faturaDeleteAtual = { conta, mes };
+    // Personaliza o texto do pop-up
+    document.getElementById('txt-confirmar-delete-fatura').innerText = `Tem certeza que deseja deletar a fatura ${conta} (${mes})?`;
+    document.getElementById('modal-confirmar-delete-fatura').classList.remove('hidden');
+}
+
+function fecharModalConfirmarDeleteFatura() {
+    faturaDeleteAtual = null;
+    document.getElementById('modal-confirmar-delete-fatura').classList.add('hidden');
+}
+
+async function efetivarDeleteFatura() {
+    if(!faturaDeleteAtual) return;
+    const btn = document.getElementById('btn-confirmar-delete-fatura');
+    btn.innerText = "Deletando...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(API_URL + '?tipo=deletar_fatura', {
+            method: 'POST',
+            redirect: 'follow',
+            body: JSON.stringify({conta: faturaDeleteAtual.conta, mes_fatura: faturaDeleteAtual.mes})
+        });
+
+        const result = await response.json();
+
+        if (result.status === "sucesso") {
+            notify('sucesso', 'Fatura excluída!');
+            fecharModalConfirmarDeleteFatura();
+            await buscarDados(); // Recarrega a tela limpando o card deletado
+        } else {
+            notify('erro', result.mensagem || 'Erro ao excluir');
+        }
+    } catch(e) {
+        notify('erro', 'Erro de conexão ao excluir');
+    }
+
+    btn.innerText = "Deletar";
+    btn.disabled = false;
+}
+
 function abrirDetalhes(conta, mes, diaVenc) {
     faturaAbertaAtual = { conta, mes, diaVenc };
     document.getElementById('det-conta').innerText = conta;
@@ -282,17 +335,20 @@ function abrirDetalhes(conta, mes, diaVenc) {
     const badgePago = document.getElementById('det-badge-pago');
     const btnSalvarVenc = document.getElementById('btn-salvar-venc');
     const inputVenc = document.getElementById('input-dia-venc');
+    const thAcoes = document.getElementById('th-acoes'); // Puxa o cabeçalho de Ações
 
     if (isPago) {
         btnCriarTransacao.classList.add('hidden');
         badgePago.classList.remove('hidden');
         btnSalvarVenc.classList.add('hidden');
         inputVenc.disabled = true;
+        if(thAcoes) thAcoes.style.display = 'none'; // Esconde o cabeçalho de Ações
     } else {
         btnCriarTransacao.classList.remove('hidden');
         badgePago.classList.add('hidden');
         btnSalvarVenc.classList.remove('hidden');
         inputVenc.disabled = false;
+        if(thAcoes) thAcoes.style.display = ''; // Mostra o cabeçalho de Ações
     }
 
     let html = "";
@@ -305,36 +361,40 @@ function abrirDetalhes(conta, mes, diaVenc) {
         limpar(g.forma_pagamento) === "CREDITO"
     );
 
-transacoes.forEach(t => {
+    transacoes.forEach(t => {
         const v = parseFloat(t.valor) || 0;
         const isEntrada = limpar(t.tipo) === 'ENTRADA';
 
         if (isEntrada) somaEntradas += v; else somaSaidas += v;
 
-        // Reduzimos o padding dos botões (p-1) para não esticarem a linha
-        const btnTrash = isPago ? '' : `<button onclick="event.stopPropagation(); abrirModalConfirmarDelete('${t.id}')" class="text-red-400 hover:text-red-600 p-1 sm:p-1.5 ml-1"><i class="fas fa-trash text-sm sm:text-base"></i></button>`;
-        const btnEdit  = isPago ? '' : `<button onclick="event.stopPropagation(); abrirModalEditar('${t.id}')" class="text-blue-400 hover:text-blue-600 p-1 sm:p-1.5"><i class="fas fa-edit text-sm sm:text-base"></i></button>`;
+        const btnTrash = isPago ? '' : `<button onclick="event.stopPropagation(); abrirModalConfirmarDelete('${t.id}')" class="text-red-400 hover:text-red-600 p-1 sm:p-1 ml-1"><i class="fas fa-trash text-sm sm:text-base"></i></button>`;
+        const btnEdit  = isPago ? '' : `<button onclick="event.stopPropagation(); abrirModalEditar('${t.id}')" class="text-blue-400 hover:text-blue-600 p-1 sm:p-1"><i class="fas fa-edit text-sm sm:text-base"></i></button>`;
 
         const dataExibicao = t.data ? String(t.data).substring(0,10) : '';
         const parcelaFormatada = t.parcela && t.parcela.trim() !== "" ? t.parcela : '-';
 
-        // Reduzimos a altura trocando o p-3/p-4 por py-1.5/px-2 (no celular) e py-2/px-3 (no PC)
+        // Se estiver PAGO, a coluna <td> de Ações inteira deixa de existir.
+        const tdAcoes = isPago ? '' : `<td class="py-1.5 px-2 sm:py-1 sm:px-3 text-right hidden sm:table-cell whitespace-nowrap">${btnEdit} ${btnTrash}</td>`;
+
+        // Removido o "hidden md:table-cell" da tag da parcela para ela aparecer no mobile!
         html += `
             <tr class="border-b border-gray-50 hover:bg-slate-50 transition-colors cursor-pointer sm:cursor-auto active:bg-slate-100 sm:active:bg-transparent"
                 onclick="if(window.innerWidth < 640 && !${isPago}) abrirModalOpcoesMobile('${t.id}')">
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-[11px] sm:text-sm font-mono">${dataExibicao}</td>
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-[11px] sm:text-sm text-slate-700 uppercase truncate max-w-[120px] sm:max-w-[300px]">${t.local} ${t.descricao ? '- ' + t.descricao : ''}</td>
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-center text-[11px] sm:text-sm text-gray-500 font-bold hidden md:table-cell">${parcelaFormatada}</td>
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-center text-[12px] sm:text-sm font-black whitespace-nowrap ${isEntrada ? 'text-green-600' : 'text-red-600'} w-24 sm:w-32">R$ ${v.toFixed(2).replace('.', ',')}</td>
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-[10px] sm:text-xs text-gray-400 uppercase truncate max-w-[80px] sm:max-w-[150px] hidden sm:table-cell">${t.categoria}</td>
-                <td class="py-1.2 px-2 sm:py-1 sm:px-3 text-right hidden sm:table-cell whitespace-nowrap">${btnEdit} ${btnTrash}</td>
+                <td class="py-1.5 px-2 sm:py-1 sm:px-3 text-[11px] sm:text-sm font-mono">${dataExibicao}</td>
+                <td class="py-1.5 px-2 sm:py-1 sm:px-3 text-[11px] sm:text-sm text-slate-700 uppercase truncate max-w-[120px] sm:max-w-[300px]">${t.local} ${t.descricao ? '- ' + t.descricao : ''}</td>
+                <td class="py-1.5 px-2 sm:py-1 sm:px-3 text-center text-[11px] sm:text-sm text-gray-500 font-bold">${parcelaFormatada}</td>
+                <td class="py-1.5 px-2 sm:py-1 sm:px-3 text-center text-[12px] sm:text-sm font-black whitespace-nowrap ${isEntrada ? 'text-green-600' : 'text-red-600'} w-24 sm:w-32">R$ ${v.toFixed(2).replace('.', ',')}</td>
+                <td class="py-1.5 px-2 sm:py-1 sm:px-3 text-[10px] sm:text-xs text-gray-400 uppercase truncate max-w-[80px] sm:max-w-[150px] hidden sm:table-cell">${t.categoria}</td>
+                ${tdAcoes}
             </tr>`;
     });
 
     const totalFatura = somaSaidas - somaEntradas;
 
     if(transacoes.length === 0) {
-        html = `<tr><td colspan="5" class="p-8 text-center text-[10px] font-black uppercase text-gray-300">Nenhum gasto encontrado nesta fatura</td></tr>`;
+        // Ajustado o colspan dinâmico dependendo se a coluna de Ações existe ou não
+        const colunasTotais = isPago ? 5 : 6;
+        html = `<tr><td colspan="${colunasTotais}" class="p-8 text-center text-[10px] font-black uppercase text-gray-300">Nenhum gasto encontrado nesta fatura</td></tr>`;
     }
 
     document.getElementById('lista-transacoes').innerHTML = html;
@@ -344,6 +404,7 @@ transacoes.forEach(t => {
 
     document.getElementById('modal-detalhes').classList.remove('hidden');
 }
+
 
 function validarDiaVencimento(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
@@ -786,8 +847,4 @@ async function salvarEdicaoTransacao() {
         notify('erro', e.message || 'Erro ao salvar');
     }
     btn.innerText = "Salvar Edição"; btn.disabled = false;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> af3fc30 (nova pagina)
