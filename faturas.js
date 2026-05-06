@@ -786,4 +786,8 @@ async function salvarEdicaoTransacao() {
         notify('erro', e.message || 'Erro ao salvar');
     }
     btn.innerText = "Salvar Edição"; btn.disabled = false;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> af3fc30 (nova pagina)
