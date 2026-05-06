@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbznMspp-LOSjo_bqQAhX4Y3PHx12FDcDeFYOeo9vBIroX0UyHv0OVZoPOnD5z5-QcOu/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwUyLEBsyFDj8wWTMcDCyMUMqrGGHN8wCKV6PfGET8iyAL2IvCSFTxL5sAByXy3AH4/exec";
 
 let listaCategorias = [];
 let listaContas = [];
