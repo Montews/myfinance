@@ -20,6 +20,18 @@ window.addEventListener('load', () => {
     document.getElementById('tr-categoria-input').addEventListener('blur', esconderDropCategorias);
 });
 
+// A FUNÇÃO ESCUDO PARA O FRONT-END
+function parseMoedaFrontend(val) {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    let str = String(val).trim();
+    if (str.includes(',')) {
+        str = str.replace(/\./g, '').replace(',', '.');
+    }
+    str = str.replace(/[^0-9.-]/g, '');
+    return parseFloat(str) || 0;
+}
+
 function formatarMoeda(v) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0); }
 function formatarMoedaSimples(v) { return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v || 0); }
 function formatarValorCompacto(v) {
@@ -102,7 +114,6 @@ function renderizarContas() {
     const hjAnt = new Date(hj.getFullYear(), hj.getMonth() - 1, 1);
     const mesAntVisual = `${MESES_NOMES[hjAnt.getMonth()]}/${String(hjAnt.getFullYear()).slice(-2)}`;
 
-    // Variáveis em minúsculo para comparação segura com o banco
     const mesAtualLower = mesAtualVisual.toLowerCase();
     const mesAntLower = mesAntVisual.toLowerCase();
 
@@ -110,9 +121,7 @@ function renderizarContas() {
     if (Array.isArray(faturasAbertas)) {
         faturasAbertas.forEach(f => {
             if (String(f.status).toUpperCase() !== 'PAGO') {
-                // CORREÇÃO AQUI: f.valor_total em vez de f.valor
-                let valLimpo = String(f.valor_total).replace(/R\$\s?/gi, '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
-                totalFaturasAbertas += Math.abs(parseFloat(valLimpo) || 0);
+                totalFaturasAbertas += Math.abs(parseMoedaFrontend(f.valor_total));
             }
         });
     }
@@ -121,18 +130,13 @@ function renderizarContas() {
         const isAtiva = conta.status === "ATIVO";
         const nomeUpper = conta.nome.toUpperCase();
 
-        // =========================================================================
-        // O ESCUDO MATEMÁTICO: RECRIANDO OS VALORES DO MÊS PARA IGNORAR A SOMA DO BANCO
-        // =========================================================================
         let realDebAtual = 0, realDebAnt = 0;
         let realCredAnt = 0;
 
         if (Array.isArray(dadosHistorico)) {
             dadosHistorico.forEach(h => {
                 if (String(h.banco).toUpperCase() === nomeUpper) {
-                    let valStr = String(h.valor).replace(/R\$\s?/gi, '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
-                    let v = Math.abs(parseFloat(valStr) || 0);
-
+                    let v = Math.abs(parseMoedaFrontend(h.valor));
                     let mesLinha = String(h.mes).toLowerCase();
 
                     if (mesLinha === mesAtualLower) {
@@ -150,19 +154,15 @@ function renderizarContas() {
         if (Array.isArray(faturasAbertas)) {
             faturasAbertas.forEach(f => {
                 if (String(f.conta).toUpperCase() === nomeUpper && String(f.mes_fatura).toLowerCase() === mesAtualLower) {
-                    // CORREÇÃO AQUI: f.valor_total em vez de f.valor
-                    let valStr = String(f.valor_total).replace(/R\$\s?/gi, '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
-                    somaFaturaAtual += Math.abs(parseFloat(valStr) || 0);
+                    somaFaturaAtual += Math.abs(parseMoedaFrontend(f.valor_total));
                 }
             });
         }
 
-        // Aplicando a cura no objeto conta
         conta.gasto_debito_atual = realDebAtual;
         conta.gasto_debito_ant = realDebAnt;
-        conta.fatura_atual = somaFaturaAtual; // Agora vai pegar os "3" reais corretamente!
+        conta.fatura_atual = somaFaturaAtual;
         conta.fatura_ant = realCredAnt;
-        // =========================================================================
 
         let labelTipo = "Conta";
         if (conta.tipo === "DEBITO") labelTipo = "Conta Corrente";
@@ -320,7 +320,6 @@ function renderizarContas() {
     document.getElementById('val-ti').innerText = formatarMoedaSimples(totalInvestido);
 }
 
-
 // ==========================================
 // MÓDULO: HISTÓRICO AVANÇADO (GRÁFICO DE LINHAS)
 // ==========================================
@@ -405,7 +404,7 @@ function renderizarGraficoHist() {
             if (Array.isArray(dadosHistorico)) {
                 dadosHistorico.forEach(h => {
                     if (h.banco === nomeUpper && h.mes === mesFormatoBanco) {
-                        let valorNum = Math.abs(parseFloat(String(h.valor).replace(/\./g, '').replace(',', '.')) || 0);
+                        let valorNum = Math.abs(parseMoedaFrontend(h.valor));
                         if (h.forma === "DEBITO" && h.fluxo === histDebitoFluxo) { somaDeb += valorNum; }
                         if (h.forma === "CREDITO") { somaCred += valorNum; }
                     }

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Assinaturas - MyFinance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        .font-black { font-weight: 900; }
+        #header-mobile { z-index: 1001 !important; }
+        #sidebar-lateral { z-index: 1000 !important; }
+        #sidebar-overlay { z-index: 999 !important; }
+        .modal-z { z-index: 1300 !important; }
+
+        .shadow-suave { box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.04), 0 2px 6px -2px rgba(0, 0, 0, 0.02); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; }
+        .color-option { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: all 0.2s; border: 3px solid transparent; }
+        .color-option.selected { border-color: #1e293b; transform: scale(1.15); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .card-inativa { opacity: 0.55; filter: grayscale(0.8); }
+
+        .input-erro-data { border-color: #ef4444 !important; color: #ef4444 !important; background-color: #fef2f2 !important; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex h-screen text-slate-900">
+
+<div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/80 lg:hidden transition-opacity"></div>
+
+<aside id="sidebar-lateral" class="fixed inset-y-0 left-0 w-64 bg-slate-800 text-white transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col shadow-2xl shrink-0 transition-transform duration-300 ease-in-out">
+    <div class="hidden lg:flex p-6 text-2xl font-bold border-b border-slate-700 items-center gap-2 text-blue-400">
+        <i class="fas fa-wallet"></i> <span class="text-white">MyFinance</span>
+    </div>
+    <nav class="flex-1 p-4 mt-20 lg:mt-0 space-y-2 text-sm font-black uppercase">
+        <a href="index.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-list-ul mr-2"></i> Transações</a>
+        <a href="investimentos.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-chart-line mr-2"></i> Investimentos</a>
+        <a href="categorias.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-tags mr-2"></i> Categorias</a>
+        <a href="faturas.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-file-invoice-dollar mr-2"></i> Faturas</a>
+        <a href="contas.html" class="block p-3 rounded hover:bg-slate-700 transition-colors"><i class="fas fa-university mr-2"></i> Contas</a>
+        <a href="#" class="block p-3 rounded bg-blue-600 shadow"><i class="fas fa-star mr-2"></i> Assinaturas</a>
+    </nav>
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+    <div id="header-mobile" class="lg:hidden fixed top-0 left-0 right-0 bg-slate-800 text-white p-4 flex items-center shadow-md h-16">
+        <button onclick="toggleSidebar()" class="p-2 hover:bg-slate-700 rounded-lg transition-colors mr-3 w-10 h-10 flex items-center justify-center"><i id="menu-icon" class="fas fa-bars text-xl"></i></button>
+        <div class="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-blue-400">Assinaturas</div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto custom-scroll w-full pt-20 lg:pt-6">
+        <header class="px-4 lg:px-6 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 shrink-0">
+            <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-red-500 transition-transform hover:scale-[1.02]">
+                <div class="flex items-center justify-between mb-1">
+                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight">Gasto Fixo</p>
+                    <span class="bg-gray-100 text-gray-500 text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Mensal</span>
+                </div>
+                <h2 id="kpi-gasto" class="text-2xl font-black text-slate-800 tracking-tighter flex items-start gap-1"><span class="text-xs mt-1">R$</span> <span>0,00</span></h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border-l-[16px] border-emerald-500 transition-transform hover:scale-[1.02]">
+                <div class="flex items-center justify-between mb-1">
+                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight">Economia Clubes</p>
+                    <span class="bg-gray-100 text-gray-500 text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Mensal</span>
+                </div>
+                <h2 id="kpi-economia" class="text-2xl font-black text-emerald-600 tracking-tighter flex items-start gap-1"><span class="text-xs mt-1">R$</span> <span>0,00</span></h2>
+            </div>
+        </header>
+
+        <section class="px-4 lg:px-6 pb-20">
+            <div class="mb-4 flex items-center gap-3">
+                <div class="h-px bg-gray-300 flex-1"></div>
+                <span class="text-xs font-black uppercase text-gray-400 tracking-widest">Assinaturas Ativas</span>
+                <div class="h-px bg-gray-300 flex-1"></div>
+            </div>
+
+            <div id="grid-assinaturas-ativas" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8 lg:auto-rows-fr">
+                <div id="btn-add-as" class="border-2 border-dashed border-gray-300 rounded-2xl flex flex-row lg:flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer h-20 lg:h-full lg:min-h-[190px] order-first lg:order-last gap-3 lg:gap-0 py-3 lg:py-0 w-full" onclick="abrirModalNovaAs(event)">
+                    <div class="w-8 h-8 lg:w-14 lg:h-14 rounded-full bg-gray-100 flex items-center justify-center pointer-events-none lg:mb-3"><i class="fas fa-plus text-sm lg:text-xl"></i></div>
+                    <span class="font-black uppercase tracking-widest text-[11px] lg:text-xs">Nova Assinatura</span>
+                </div>
+            </div>
+
+            <div id="container-inativas"></div>
+        </section>
+    </div>
+</main>
+
+<!-- MODAL: CONFIGURAR/NOVA ASSINATURA -->
+<div id="modal-config-as" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
+        <div id="as-header" class="p-5 text-white flex justify-between items-center shrink-0 transition-colors">
+            <h3 id="as-titulo" class="font-black uppercase tracking-widest text-sm"><i class="fas fa-cog mr-2"></i> Configurar Assinatura</h3>
+            <button onclick="fecharModais()" class="text-white/70 hover:text-white outline-none"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 space-y-4 overflow-y-auto custom-scroll">
+            <input type="hidden" id="as-id">
+
+            <div id="box-toggle-ativo" class="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer" onclick="toggleStatusAs()">
+                <span class="text-[10px] font-black uppercase text-slate-700 tracking-widest">Assinatura Ativa</span>
+                <button id="btn-toggle-as" type="button" class="w-12 h-6 rounded-full bg-emerald-500 relative transition-colors pointer-events-none"><div id="bolinha-as" class="w-4 h-4 bg-white rounded-full absolute top-1 left-[26px] transition-all"></div></button>
+                <input type="hidden" id="as-status" value="ATIVO">
+            </div>
+
+            <div><label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Nome</label><input type="text" id="as-nome" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black bg-white outline-none uppercase transition-all focus:border-blue-500"></div>
+
+            <div>
+                <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Valor Mensal</label>
+                <input type="text" id="as-valor" oninput="mascaraValor(this)" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black text-center text-red-600 transition-all focus:border-blue-500">
+            </div>
+
+            <div class="flex gap-3">
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Conta Padrão</label>
+                    <input type="text" id="as-conta" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black uppercase text-center transition-all focus:border-blue-500" placeholder="Ex: NUBANK" autocomplete="off" onfocus="mostrarDropContas('as-conta')" oninput="filtrarContas('as-conta')" onblur="esconderDropContas('as-conta')">
+                    <div id="as-conta-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Forma Pad.</label>
+                    <input type="text" id="as-forma" class="w-full p-3 border border-gray-200 rounded-xl text-xs font-black bg-white outline-none uppercase cursor-pointer text-center focus:border-blue-500" autocomplete="off" onfocus="mostrarDropForma('as-forma')" oninput="filtrarForma('as-forma')" onblur="esconderDropForma('as-forma')">
+                    <div id="as-forma-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Categoria (Para Gastos)</label>
+                <input type="text" id="as-categoria" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black bg-white outline-none uppercase transition-all focus:border-blue-500" placeholder="Ex: LAZER" autocomplete="off" onfocus="mostrarDropCategorias('as-categoria')" oninput="filtrarCategorias('as-categoria')" onblur="esconderDropCategorias('as-categoria')">
+                <div id="as-categoria-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+            </div>
+
+            <div class="flex items-center gap-2 p-1 border-b border-gray-100 pb-3">
+                <input type="checkbox" id="as-is-clube" class="w-5 h-5 cursor-pointer accent-blue-600">
+                <label for="as-is-clube" class="text-[10px] font-black uppercase text-slate-600 cursor-pointer tracking-widest">É um Clube de Benefícios?</label>
+            </div>
+
+            <div><label class="block text-[9px] font-black uppercase text-gray-500 mb-2 ml-1">Cor do Card</label><div class="grid grid-cols-8 gap-2 bg-gray-50 p-3 rounded-xl border" id="paleta-cores-as"></div><input type="hidden" id="as-cor"></div>
+            <button onclick="salvarConfigAs()" class="w-full py-4 bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest rounded-xl transition-all outline-none hover:bg-slate-900 mt-2 shadow-md">Salvar Configurações</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DETALHES E HISTÓRICO -->
+<div id="modal-detalhes" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in flex flex-col max-h-[85vh]">
+        <div class="p-5 text-white flex justify-between items-start shrink-0 transition-colors" id="det-header">
+            <div class="flex flex-col"><h3 id="det-nome" class="font-black uppercase tracking-widest text-lg">...</h3><span id="det-status-chip" class="text-[9px] font-black uppercase bg-black/20 px-2 py-0.5 rounded mt-1 w-max border border-white/10 tracking-widest">ATIVO</span></div>
+            <button onclick="fecharModais()" class="text-white/70 hover:text-white outline-none"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 overflow-y-auto custom-scroll flex-1 bg-slate-50 flex flex-col">
+
+            <div class="flex items-center justify-between mb-2 px-1">
+                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Visão Geral</span>
+                <span class="bg-blue-50 text-blue-500 border border-blue-100 text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest shadow-sm">Valores Acumulados</span>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 mb-6 shrink-0" id="det-grid">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 text-center shadow-sm">
+                    <span class="text-[9px] font-black uppercase text-gray-400 block mb-0.5 tracking-widest">Total Gasto</span>
+                    <span id="det-total-gasto" class="text-2xl font-black text-red-500">R$ 0,00</span>
+                </div>
+                <div id="det-box-eco" class="bg-white p-4 rounded-xl border border-gray-200 text-center shadow-sm">
+                    <span class="text-[9px] font-black uppercase text-gray-400 block mb-0.5 tracking-widest">Total Economizado</span>
+                    <span id="det-total-eco" class="text-2xl font-black text-emerald-500">R$ 0,00</span>
+                </div>
+            </div>
+
+            <button onclick="abrirModalRetroativo()" class="w-full py-4 mb-6 border-2 border-dashed border-gray-300 text-gray-400 hover:text-slate-800 hover:border-slate-400 hover:bg-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors shrink-0 outline-none"><i class="fas fa-plus mr-1"></i> Lançar Pagamento Retroativo</button>
+
+            <div class="flex flex-col w-full">
+                <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 px-1">Histórico Detalhado</h4>
+                <div class="bg-white rounded-xl border shadow-sm flex flex-col overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="p-3 text-[9px] font-black uppercase text-gray-500">Data</th>
+                            <th class="p-3 text-[9px] font-black uppercase text-gray-500">Conta/Ação</th>
+                            <th class="p-3 text-[9px] font-black uppercase text-gray-500 text-right">Valor</th>
+                        </tr>
+                        </thead>
+                        <tbody id="det-tabela" class="divide-y divide-gray-100 bg-white"></tbody>
+                    </table>
+                    <div id="det-paginacao" class="hidden flex justify-between items-center p-3 bg-gray-50 border-t border-gray-100 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <button onclick="mudarPaginaHistDet(-1)" class="hover:text-blue-600 outline-none disabled:opacity-30" id="btn-hist-prev"><i class="fas fa-chevron-left mr-1"></i> Anterior</button>
+                        <span id="det-page-info">Pág 1/1</span>
+                        <button onclick="mudarPaginaHistDet(1)" class="hover:text-blue-600 outline-none disabled:opacity-30" id="btn-hist-next">Próxima <i class="fas fa-chevron-right ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CONFIRMAR DUPLICIDADE DE PAGAMENTO -->
+<div id="modal-confirma-pagamento" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col text-center p-6">
+        <div class="w-16 h-16 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3 class="font-black uppercase tracking-widest text-lg text-slate-800 mb-2">Atenção</h3>
+        <p class="text-sm font-bold text-gray-500 mb-6 leading-relaxed">Você já fez esse pagamento este mês.<br>Quer registrar outro pagamento mesmo assim?</p>
+        <input type="hidden" id="confirma-pg-id">
+        <div class="flex gap-3">
+            <button onclick="fecharModais()" class="flex-1 py-4 border border-gray-200 text-gray-500 hover:bg-gray-50 font-black text-[11px] uppercase tracking-widest rounded-xl transition-all outline-none">Não, Cancelar</button>
+            <button onclick="prosseguirPagamentoDuplicado()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-widest rounded-xl transition-all outline-none shadow-md">Sim, Pagar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: REGISTRAR DESCONTO -->
+<div id="modal-desconto" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col">
+        <div id="dc-header" class="p-5 text-white flex justify-between items-center shrink-0 transition-colors">
+            <h3 class="font-black uppercase tracking-widest text-sm"><i class="fas fa-tag mr-2"></i> Registrar Economia</h3>
+            <button onclick="fecharModais()" class="text-white/70 hover:text-white outline-none"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-4">
+            <input type="hidden" id="dc-id">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center -mt-1 shadow-sm mx-auto w-full">
+                <span class="text-[8px] font-black uppercase text-gray-400 tracking-widest block mb-1">Clube de Benefícios</span>
+                <h4 id="dc-nome-conta" class="font-black text-slate-700 uppercase tracking-tight text-base leading-none">...</h4>
+            </div>
+
+            <div class="flex gap-3">
+                <div class="w-1/2 relative mt-1">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Data</label>
+                    <input type="text" id="dc-data" maxlength="10" oninput="mascaraData(this)" onblur="validarDataInput(this, 'erro-dc-data', true)" class="w-full p-4 border border-gray-200 rounded-xl text-sm font-black text-center outline-none focus:border-blue-500 transition-colors">
+                    <div id="erro-dc-data" class="hidden absolute top-full left-0 mt-1 w-full text-center text-[9px] font-black text-red-500 uppercase tracking-widest"></div>
+                </div>
+                <div class="w-1/2 mt-1">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Valor (Lucro)</label>
+                    <input type="text" id="dc-valor" maxlength="10" oninput="mascaraValor(this)" class="w-full p-4 border border-gray-200 rounded-xl text-sm font-black bg-white outline-none text-emerald-600 text-center focus:border-blue-500" placeholder="0,00">
+                </div>
+            </div>
+
+            <div class="mt-2"><label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Local da Compra</label><input type="text" id="dc-local" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black bg-white outline-none uppercase focus:border-blue-500" placeholder="Ex: Farmácia, Mercado"></div>
+            <div><label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Detalhes (Opcional)</label><input type="text" id="dc-detalhes" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black bg-white outline-none focus:border-blue-500" placeholder="Ex: Desconto em Remédios"></div>
+
+            <button onclick="efetivarDesconto()" class="w-full py-4 bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-md transition-all outline-none hover:bg-slate-900 mt-2">Salvar no Benefício</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PAGAMENTO -->
+<div id="modal-pagamento" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col">
+        <div id="pg-header" class="p-5 text-white flex justify-between items-center shrink-0 transition-colors">
+            <h3 class="font-black uppercase tracking-widest text-sm"><i class="fas fa-check-circle mr-2"></i> Lançar Pagamento</h3>
+            <button onclick="fecharModais()" class="text-white/70 hover:text-white outline-none"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-4 overflow-visible">
+            <input type="hidden" id="pg-id">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center -mt-1 shadow-sm mx-auto w-full">
+                <span class="text-[8px] font-black uppercase text-gray-400 tracking-widest block mb-1">Assinatura</span>
+                <h4 id="pg-nome-conta" class="font-black text-slate-700 uppercase tracking-tight text-base leading-none">...</h4>
+            </div>
+
+            <div class="flex gap-3">
+                <div class="w-1/2 relative mt-1">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Data</label>
+                    <input type="text" id="pg-data" maxlength="10" oninput="mascaraData(this)" onblur="validarDataInput(this, 'erro-pg-data', true)" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black text-center outline-none focus:border-blue-500 transition-colors">
+                    <div id="erro-pg-data" class="hidden absolute top-full left-0 mt-1 w-full text-center text-[9px] font-black text-red-500 uppercase tracking-widest"></div>
+                </div>
+                <div class="w-1/2 mt-1">
+                    <label id="label-pg-valor" class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Valor (Fixado)</label>
+                    <input type="text" id="pg-valor" oninput="mascaraValor(this)" class="w-full p-3 border rounded-xl text-sm font-black text-center outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-3 relative mt-2">
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Conta Utilizada</label>
+                    <input type="text" id="pg-conta" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black uppercase text-center transition-all focus:border-blue-500" autocomplete="off" onfocus="mostrarDropContas('pg-conta')" oninput="filtrarContas('pg-conta')" onblur="esconderDropContas('pg-conta')">
+                    <div id="pg-conta-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Forma de Pag.</label>
+                    <input type="text" id="pg-forma" class="w-full p-3 border border-gray-200 rounded-xl text-xs font-black bg-white outline-none uppercase cursor-pointer text-center focus:border-blue-500" autocomplete="off" onfocus="mostrarDropForma('pg-forma')" oninput="filtrarForma('pg-forma')" onblur="esconderDropForma('pg-forma')">
+                    <div id="pg-forma-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+            </div>
+
+            <button onclick="efetivarPagamento()" class="w-full py-4 bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest rounded-xl transition-all outline-none hover:bg-slate-900 mt-2 shadow-md">Confirmar Lançamento</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: RETROATIVO -->
+<div id="modal-retroativo" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 modal-z" onclick="if(event.target === this) fecharModais()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col">
+        <div id="rt-header" class="p-5 text-white flex justify-between items-center shrink-0 transition-colors">
+            <h3 class="font-black uppercase tracking-widest text-sm"><i class="fas fa-history mr-2"></i> Lançamento Retroativo</h3>
+            <button onclick="fecharModais()" class="text-white/70 hover:text-white outline-none"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-5 flex flex-col gap-4 overflow-visible">
+            <input type="hidden" id="rt-id">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center -mt-1 shadow-sm mx-auto w-full">
+                <span class="text-[8px] font-black uppercase text-gray-400 tracking-widest block mb-1">Assinatura</span>
+                <h4 id="rt-nome-assinatura" class="font-black text-slate-700 uppercase tracking-tight text-base leading-none">...</h4>
+            </div>
+
+            <div class="flex gap-3">
+                <div class="w-1/2 relative mt-1">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Data (DD/MM/AAAA)</label>
+                    <input type="text" id="rt-data" maxlength="10" oninput="mascaraData(this)" onblur="validarDataInput(this, 'erro-rt-data', false)" placeholder="Ex: 05/03/2026" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black text-center outline-none focus:border-blue-500 transition-all">
+                    <div id="erro-rt-data" class="hidden absolute top-full left-0 mt-1 w-full text-center text-[9px] font-black text-red-500 uppercase tracking-widest"></div>
+                </div>
+                <div class="w-1/2 mt-1">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Valor na Época</label>
+                    <input type="text" id="rt-valor" oninput="mascaraValor(this)" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black text-center text-red-600 outline-none focus:border-blue-500 transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-3 relative mt-2">
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Conta Utilizada</label>
+                    <input type="text" id="rt-conta" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-black uppercase text-center transition-all focus:border-blue-500" placeholder="Ex: NUBANK" autocomplete="off" onfocus="mostrarDropContas('rt-conta')" oninput="filtrarContas('rt-conta')" onblur="esconderDropContas('rt-conta')">
+                    <div id="rt-conta-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+                <div class="w-1/2 relative">
+                    <label class="block text-[9px] font-black uppercase text-gray-500 mb-1 ml-1">Forma de Pag.</label>
+                    <input type="text" id="rt-forma" class="w-full p-3 border border-gray-200 rounded-xl text-xs font-black bg-white outline-none uppercase cursor-pointer text-center focus:border-blue-500" autocomplete="off" onfocus="mostrarDropForma('rt-forma')" oninput="filtrarForma('rt-forma')" onblur="esconderDropForma('rt-forma')">
+                    <div id="rt-forma-drop" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto custom-scroll text-center"></div>
+                </div>
+            </div>
+
+            <button onclick="efetivarRetroativo()" class="w-full py-4 bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest rounded-xl outline-none hover:bg-slate-900 mt-2 shadow-md">Lançar no Histórico</button>
+        </div>
+    </div>
+</div>
+
+<div class="fixed top-3 right-4 lg:top-auto lg:bottom-6 lg:right-6 z-[2000] flex flex-col items-end pointer-events-none">
+    <div id="status-conexao-flutuante" class="pointer-events-auto cursor-pointer flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xs lg:text-sm font-black uppercase tracking-widest w-10 h-10 lg:w-auto lg:h-auto lg:px-4 lg:py-3 rounded-full border shadow-2xl transition-all duration-500 transform bg-white opacity-0 scale-75">
+        <i id="status-icon" class="fas fa-sync fa-spin text-lg text-blue-500"></i><span id="status-text" class="hidden lg:inline-block">Conectando...</span>
+    </div>
+</div>
+<div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[1500]"></div>
+
+<script src="assinaturas.js?v=12"></script>
+</body>
+</html>
